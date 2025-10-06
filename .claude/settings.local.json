@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(move core.js js )",
+      "Bash(move tasks.js js )",
+      "Bash(move render.js js )",
+      "Bash(move modals.js js )",
+      "Bash(move gauge.js js )",
+      "Bash(move events.js js )",
+      "Bash(move ui-main.js js)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

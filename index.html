@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nowtask</title>
+  <link rel="stylesheet" href="css/style-base.css">
+  <link rel="stylesheet" href="css/style-components.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="app-title">nowtask</h1>
+      <div class="header-actions">
+        <button class="settings-icon-btn" id="settings-icon-btn" aria-label="設定" title="設定">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m5.196-15.196l-4.242 4.242m-5.908 5.908l-4.242 4.242M23 12h-6m-6 0H1m15.196 5.196l-4.242-4.242m-5.908-5.908l-4.242-4.242"></path>
+          </svg>
+        </button>
+        <button class="trash-icon-btn" id="trash-icon-btn" aria-label="ゴミ箱" title="ゴミ箱">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="quick-add">
+      <input type="text" id="quick-add-input" placeholder="タスク名を入力してEnter" maxlength="100" autocomplete="off">
+      <div class="quick-add-controls">
+        <button class="quick-date-btn" id="quick-date-btn" type="button" title="期限日時を設定">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
+        <select id="quick-add-duration" class="duration-select">
+          <option value="">時間未設定</option>
+          <option value="15">15分</option>
+          <option value="30">30分</option>
+          <option value="45">45分</option>
+          <option value="60">1時間</option>
+          <option value="75">1時間15分</option>
+          <option value="90">1時間30分</option>
+          <option value="105">1時間45分</option>
+          <option value="120">2時間</option>
+          <option value="135">2時間15分</option>
+          <option value="150">2時間30分</option>
+          <option value="165">2時間45分</option>
+          <option value="180">3時間</option>
+          <option value="240">4時間</option>
+          <option value="300">5時間</option>
+          <option value="360">6時間</option>
+          <option value="480">8時間</option>
+        </select>
+      </div>
+      <input type="datetime-local" id="quick-add-date" class="quick-date-input" style="display: none;">
+    </div>
+  </header>
+
+  <!-- タブナビゲーション -->
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="tasks">タスク</button>
+  </nav>
+
+  <!-- メインコンテンツエリア -->
+  <main class="main-content">
+    <!-- タスクリスト -->
+    <div class="tab-content active" id="tasks-tab">
+      <!-- 24時間ゲージ -->
+      <div class="time-gauge-container">
+        <div class="time-gauge-header">
+          <span class="current-time" id="current-time">00:00</span>
+          <span class="gauge-label">今日の予定</span>
+          <span class="remaining-tasks" id="remaining-tasks">残り: 0時間</span>
+        </div>
+        <div class="time-gauge">
+          <div class="time-gauge-bg"></div>
+          <div class="time-gauge-elapsed" id="time-gauge-elapsed"></div>
+          <div class="time-gauge-scheduled" id="time-gauge-scheduled"></div>
+          <div class="time-marker" id="time-marker"></div>
+        </div>
+        <div class="time-gauge-labels">
+          <span>0:00</span>
+          <span>6:00</span>
+          <span>12:00</span>
+          <span>18:00</span>
+          <span>24:00</span>
+        </div>
+        <div class="gauge-legend">
+          <div class="legend-item">
+            <span class="legend-color elapsed"></span>
+            <span class="legend-text">経過時間</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color scheduled"></span>
+            <span class="legend-text">予定タスク</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color marker"></span>
+            <span class="legend-text">現在時刻</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="tasks-list" class="task-list"></div>
+      <div class="empty-state" id="tasks-empty">
+        <p>タスクがありません</p>
+      </div>
+
+      <!-- 完了済みセクション（折りたたみ） -->
+      <div class="completed-section" id="completed-section">
+        <button class="completed-toggle" id="completed-toggle">
+          <span class="toggle-icon">▶</span>
+          <span class="toggle-text">完了済み</span>
+          <span class="completed-count" id="completed-count">(0)</span>
+        </button>
+        <div class="completed-content" id="completed-content">
+          <div id="completed-list" class="task-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ゴミ箱リスト -->
+    <div class="tab-content" id="trash-tab">
+      <div id="trash-list" class="task-list"></div>
+      <div class="empty-state" id="trash-empty">
+        <p>ゴミ箱は空です</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 新規タスク作成FAB -->
+  <button class="fab" id="create-task-btn" aria-label="新規タスク作成">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+
+  <!-- タスク作成/編集モーダル -->
+  <div class="modal" id="task-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">新規タスク</h2>
+        <button class="close-btn" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="task-title">タスク名 <span class="required">*</span></label>
+          <input type="text" id="task-title" maxlength="100" placeholder="タスク名を入力" autocomplete="off">
+          <div class="char-count"><span id="title-char-count">0</span>/100</div>
+        </div>
+        <div class="form-group">
+          <label for="task-memo">メモ</label>
+          <textarea id="task-memo" rows="4" placeholder="メモを入力（任意）"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="task-due-date">期限日時</label>
+          <input type="datetime-local" id="task-due-date">
+        </div>
+        <div class="form-group timer-section" id="timer-section" style="display: none;">
+          <label>累積時間</label>
+          <div class="timer-display">
+            <span id="timer-display">00:00:00</span>
+            <button type="button" class="timer-btn" id="timer-toggle-btn">開始</button>
+          </div>
+        </div>
+        <div class="form-group subtasks-section" id="subtasks-section" style="display: none;">
+          <label>サブタスク</label>
+          <div id="subtasks-list" class="subtasks-list"></div>
+          <button type="button" class="btn-add-subtask" id="add-subtask-btn">+ サブタスクを追加</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-btn">キャンセル</button>
+        <button class="btn btn-danger" id="delete-btn" style="display: none;">削除</button>
+        <button class="btn btn-primary" id="save-btn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認ダイアログ -->
+  <div class="modal" id="confirm-modal">
+    <div class="modal-content confirm-modal">
+      <div class="modal-header">
+        <h2 id="confirm-title">確認</h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="confirm-cancel-btn">キャンセル</button>
+        <button class="btn btn-primary" id="confirm-ok-btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定モーダル -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>設定</h2>
+        <button class="close-btn" id="close-settings-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3 class="settings-section-title">デイリールーティン</h3>
+        <p class="settings-description">毎日繰り返すタスクを設定できます。有効にすると、毎日自動的にタスクが作成されます。</p>
+
+        <div class="routine-item">
+          <div class="routine-header">
+            <label class="routine-toggle">
+              <input type="checkbox" id="routine-breakfast-enabled">
+              <span class="routine-name">朝食</span>
+            </label>
+            <select id="routine-breakfast-duration" class="routine-duration-inline">
+              <option value="15">15分</option>
+              <option value="30" selected>30分</option>
+              <option value="45">45分</option>
+              <option value="60">1時間</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="routine-item">
+          <div class="routine-header">
+            <label class="routine-toggle">
+              <input type="checkbox" id="routine-lunch-enabled">
+              <span class="routine-name">昼食</span>
+            </label>
+            <select id="routine-lunch-duration" class="routine-duration-inline">
+              <option value="15">15分</option>
+              <option value="30">30分</option>
+              <option value="45" selected>45分</option>
+              <option value="60">1時間</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="routine-item">
+          <div class="routine-header">
+            <label class="routine-toggle">
+              <input type="checkbox" id="routine-dinner-enabled">
+              <span class="routine-name">夕食</span>
+            </label>
+            <select id="routine-dinner-duration" class="routine-duration-inline">
+              <option value="30">30分</option>
+              <option value="45">45分</option>
+              <option value="60" selected>1時間</option>
+              <option value="90">1時間30分</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="routine-item">
+          <div class="routine-header">
+            <label class="routine-toggle">
+              <input type="checkbox" id="routine-brush-enabled">
+              <span class="routine-name">歯磨き</span>
+            </label>
+            <select id="routine-brush-duration" class="routine-duration-inline">
+              <option value="5">5分</option>
+              <option value="10" selected>10分</option>
+              <option value="15">15分</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="routine-item">
+          <div class="routine-header">
+            <label class="routine-toggle">
+              <input type="checkbox" id="routine-sleep-enabled">
+              <span class="routine-name">睡眠</span>
+            </label>
+            <select id="routine-sleep-duration" class="routine-duration-inline">
+              <option value="360">6時間</option>
+              <option value="420">7時間</option>
+              <option value="480" selected>8時間</option>
+              <option value="540">9時間</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="save-settings-btn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/gauge.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/ui-main.js"></script>
+</body>
+</html>
