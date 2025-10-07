@@ -3,8 +3,31 @@
 // ========================================
 
 // 24時間ゲージ更新
-function updateTimeGauge() {
-  const now = new Date();
+// dateArg: Date オブジェクトか ISO 日付文字列（YYYY-MM-DD）を受け取る。未指定なら現在日時を使用。
+function updateTimeGauge(dateArg) {
+  let now = new Date();
+  let targetDate = new Date(now);
+  if (dateArg) {
+    if (typeof dateArg === 'string') {
+      // ISO 日付文字列（YYYY-MM-DD）ならその日の0時を使う
+      const parts = dateArg.split('-');
+      if (parts.length === 3) {
+        targetDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      }
+    } else if (dateArg instanceof Date) {
+      targetDate = new Date(dateArg);
+      targetDate.setHours(0,0,0,0);
+    }
+    // ゲージの基準時刻は targetDate の午前0時からの相対として表示するため、now は targetDate の現在時刻相当を使用する
+    // もし targetDate が今日でない場合は、現在時刻を targetDate の午前0時に置き換え（表示上は0%）
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (formatDateISO(targetDate) !== formatDateISO(today)) {
+      // 表示時刻を targetDate の 0:00 に設定（経過は0）
+      now = new Date(targetDate);
+      now.setHours(0,0,0,0);
+    }
+  }
   const hours = now.getHours();
   const minutes = now.getMinutes();
 
@@ -24,28 +47,35 @@ function updateTimeGauge() {
   const marker = document.getElementById('time-marker');
   marker.style.left = `${percentElapsed}%`;
 
-  // 今日の予定時間更新
-  updateScheduledTasks();
+  // 指定日の日付で予定を集計するよう updateScheduledTasks を呼び出す
+  updateScheduledTasks(dateArg);
 }
 
 // 今日の予定タスク時間を表示
-function updateScheduledTasks() {
+// dateArg: Date オブジェクトか ISO 日付文字列（YYYY-MM-DD）。未指定なら今日を対象。
+function updateScheduledTasks(dateArg) {
   const tasks = getTasks();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  let baseDate = new Date();
+  baseDate.setHours(0, 0, 0, 0);
+  if (dateArg) {
+    if (typeof dateArg === 'string') {
+      const parts = dateArg.split('-');
+      if (parts.length === 3) baseDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    } else if (dateArg instanceof Date) {
+      baseDate = new Date(dateArg);
+      baseDate.setHours(0,0,0,0);
+    }
+  }
 
-  const tomorrow = new Date(today);
+  const tomorrow = new Date(baseDate);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // 今日の期限があるタスク、または期限はないが所要時間が設定されているタスクを抽出（完了済みも含む）
+  // baseDate の範囲にあるタスク、または期限なしだが所要時間があるタスクを抽出
   const todayTasks = tasks.filter(task => {
-    // 期限がある場合は今日の範囲内かチェック
     if (task.dueDate) {
       const dueDate = new Date(task.dueDate);
-      return dueDate >= today && dueDate < tomorrow;
+      return dueDate >= baseDate && dueDate < tomorrow;
     }
-
-    // 期限はないが所要時間が設定されている場合も含める
     return task.duration && task.duration > 0;
   });
 

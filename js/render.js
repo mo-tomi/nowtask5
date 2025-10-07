@@ -45,7 +45,13 @@ function groupTasksByDate(tasks) {
     }
 
     if (!groups[dateKey]) {
-      groups[dateKey] = { date: dateKey, label, tasks: [], sortOrder: getSortOrder(dateKey, task.dueDate) };
+      // dateObj はそのグループの日付（午前0時）を保持する。期限なしは null。
+      let dateObj = null;
+      if (task.dueDate) {
+        dateObj = new Date(task.dueDate);
+        dateObj.setHours(0, 0, 0, 0);
+      }
+      groups[dateKey] = { date: dateKey, label, tasks: [], sortOrder: getSortOrder(dateKey, task.dueDate), dateObj };
     }
     groups[dateKey].tasks.push(task);
   });
@@ -73,12 +79,35 @@ function formatDate(dateStr) {
   return `${month}月${day}日 (${weekday})`;
 }
 
+// Date オブジェクトを YYYY-MM-DD 形式の文字列に変換（null 安全）
+function formatDateISO(dateObj) {
+  if (!dateObj) return '';
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 // タスクリスト表示
 function renderTasks() {
   const tasks = getTasks();
   const trash = loadFromStorage(STORAGE_KEYS.TRASH, []);
 
-  const activeTasks = tasks.filter(t => !t.isCompleted && !t.parentId);
+  // 並び替え設定を取得（localStorage から復元）
+  const savedSort = loadFromStorage(STORAGE_KEYS.SORT_PREFERENCE, 'time');
+  const sortSelectEl = document.getElementById('sort-select');
+  if (sortSelectEl) {
+    sortSelectEl.value = savedSort;
+    // 変更時に保存して再描画
+    sortSelectEl.onchange = () => {
+      saveToStorage(STORAGE_KEYS.SORT_PREFERENCE, sortSelectEl.value);
+      renderTasks();
+    };
+  }
+
+  let activeTasks = tasks.filter(t => !t.isCompleted && !t.parentId);
+  // 並び替え設定（レンダリング時に各日付グループ内で適用する）
+  const sortPref = (sortSelectEl && sortSelectEl.value) || savedSort || 'time';
   const completedTasks = tasks.filter(t => t.isCompleted && !t.parentId);
 
   // タスクタブ
@@ -96,9 +125,25 @@ function renderTasks() {
 
     // 日付順にレンダリング
     tasksByDate.forEach(({ date, label, tasks: dateTasks }) => {
+      // 各日付グループ内でソートを適用
+      if (sortPref === 'time') {
+        dateTasks.sort((a, b) => {
+          // 期限なしは末尾に回す
+          if (!a.dueDate && !b.dueDate) return 0;
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+      } else if (sortPref === 'created') {
+        // 追加順: createdAt の降順（新しいものを上に）
+        dateTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
       // 日付セパレーター
       const dateSeparator = document.createElement('div');
       dateSeparator.className = 'date-separator';
+      // data-date に ISO 日付（YYYY-MM-DD）を入れておくとスクロール連動で判定しやすい
+      const isoDate = (date === 'no_date') ? '' : (tasksByDate.find(g => g.date === date) && formatDateISO(tasksByDate.find(g => g.date === date).dateObj));
+      dateSeparator.dataset.date = isoDate || '';
       dateSeparator.innerHTML = `
         <div class="date-separator-line"></div>
         <div class="date-separator-label">${label}</div>
@@ -222,6 +267,46 @@ function createTaskElement(task, level = 0) {
   // サブタスク数表示（子タスクを持つ場合）
   const subtasks = getSubtasks(task.id);
   if (subtasks.length > 0) {
+    // 折りたたみトグル（サブタスクを持つ親タスクに表示）
+    const collapseToggle = document.createElement('button');
+    collapseToggle.className = 'collapse-toggle';
+    collapseToggle.title = 'サブタスクを折りたたむ/展開する';
+    // 初期は展開状態
+    collapseToggle.textContent = '▼';
+    // data 属性で開閉状態を管理
+    div.dataset.collapsed = 'false';
+
+    collapseToggle.addEventListener('click', (e) => {
+      // モーダルや編集イベントを発火させない
+      e.stopPropagation();
+      const parentLevel = Number(div.dataset.level || 0);
+      const isCollapsed = div.dataset.collapsed === 'true';
+
+      // トグル表示
+      div.dataset.collapsed = isCollapsed ? 'false' : 'true';
+      collapseToggle.textContent = isCollapsed ? '▼' : '▶';
+
+      // 親要素の次の兄弟要素から探索し、親より深いレベルの要素を隠す/表示する
+      let sibling = div.nextElementSibling;
+      while (sibling) {
+        const siblingLevel = Number(sibling.dataset.level || 0);
+        // 親より深ければサブタスクとみなす
+        if (siblingLevel > parentLevel) {
+          if (div.dataset.collapsed === 'true') {
+            sibling.classList.add('subtask-hidden');
+          } else {
+            sibling.classList.remove('subtask-hidden');
+          }
+        } else {
+          // 同レベルかそれ以下に到達したらサブタスク列の終端
+          break;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+    });
+
+    meta.appendChild(collapseToggle);
+
     const subtaskCount = document.createElement('span');
     subtaskCount.className = 'subtask-count';
     const completedCount = subtasks.filter(st => st.isCompleted).length;

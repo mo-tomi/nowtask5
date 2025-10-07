@@ -253,3 +253,46 @@
 .fab:active {
   transform: scale(0.95);
 }
+
+/* ========================================
+   サブタスク折りたたみスタイル
+   ======================================== */
+.collapse-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 8px;
+  color: #616161;
+  padding: 4px;
+}
+
+.collapse-toggle:hover {
+  color: #000000;
+}
+
+/* 非表示にする際は高さとパディングを0にして滑らかに折りたたむ */
+.subtask-hidden {
+  display: block; /* ブロックは維持してトランジションのために max-height を操作 */
+  max-height: 0 !important;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* サブタスクのデフォルトは十分な max-height を与えておく */
+.task-item.subtask {
+  max-height: 200px;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  opacity: 1;
+}
+
+/* 並び替えセレクトの簡易スタイル */
+.sort-container select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background: white;
+}

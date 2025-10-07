@@ -10,6 +10,9 @@ function openCreateModal() {
   document.getElementById('task-title').value = '';
   document.getElementById('task-memo').value = '';
   document.getElementById('task-due-date').value = '';
+  // 所要時間初期化
+  const durationEl = document.getElementById('task-duration');
+  if (durationEl) durationEl.value = '';
   document.getElementById('title-char-count').textContent = '0';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('timer-section').style.display = 'none';
@@ -40,6 +43,9 @@ function openEditModal(id) {
   } else {
     document.getElementById('task-due-date').value = '';
   }
+  // 所要時間を反映
+  const durationEl = document.getElementById('task-duration');
+  if (durationEl) durationEl.value = task.duration || '';
 
   document.getElementById('delete-btn').style.display = 'inline-block';
   document.getElementById('timer-section').style.display = 'block';
@@ -180,6 +186,8 @@ function saveTask() {
 
   const memo = document.getElementById('task-memo').value.trim();
   const dueDateInput = document.getElementById('task-due-date').value;
+  const durationValue = document.getElementById('task-duration') ? document.getElementById('task-duration').value : '';
+  const duration = durationValue ? parseInt(durationValue) : null;
 
   // デフォルト18:00を設定
   let dueDate = null;
@@ -191,7 +199,7 @@ function saveTask() {
 
   if (editingTaskId) {
     // 更新
-    updateTask(editingTaskId, { title, memo, dueDate });
+    updateTask(editingTaskId, { title, memo, dueDate, duration });
 
     // サブタスク保存
     const tasks = getTasks();
@@ -211,13 +219,15 @@ function saveTask() {
         updateTask(subtask.id, subtask);
       } else {
         const newTasks = getTasks();
+        // サブタスクに duration が指定されていれば反映（通常は null）
+        if (subtask.duration === undefined) subtask.duration = null;
         newTasks.unshift(subtask);
         saveTasks(newTasks);
       }
     });
   } else {
     // 新規作成
-    createTask(title, memo, dueDate);
+    createTask(title, memo, dueDate, null, false, duration);
   }
 
   closeModal();

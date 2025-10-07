@@ -4,6 +4,7 @@
 const STORAGE_KEYS = {
   TASKS: 'nowtask_tasks',
   TRASH: 'nowtask_trash',
+  SORT_PREFERENCE: 'nowtask_sort_pref',
   SETTINGS: 'nowtask_settings',
   ROUTINES: 'nowtask_routines'
 };

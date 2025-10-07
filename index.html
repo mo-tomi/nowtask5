@@ -73,10 +73,7 @@
     </form>
   </header>
 
-  <!-- タブナビゲーション -->
-  <nav class="tabs">
-    <button class="tab-button active" data-tab="tasks">タスク</button>
-  </nav>
+  <!-- タブナビゲーション（削除） -->
 
   <!-- メインコンテンツエリア -->
   <main class="main-content">
@@ -116,6 +113,15 @@
             <span class="legend-text">現在時刻</span>
           </div>
         </div>
+      </div>
+
+      <!-- 並び替えセレクト -->
+      <div class="sort-container" style="display:flex; align-items:center; gap:8px; margin: 12px 0;">
+        <label for="sort-select" style="font-size:14px; color:#616161;">並び替え:</label>
+        <select id="sort-select">
+          <option value="time">時間順（期限が近い順）</option>
+          <option value="created">追加順（新しい順）</option>
+        </select>
       </div>
 
       <div id="tasks-list" class="task-list"></div>
@@ -186,6 +192,22 @@
         <div class="form-group">
           <label for="task-due-date">期限日時</label>
           <input type="datetime-local" id="task-due-date">
+        </div>
+        <div class="form-group">
+          <label for="task-duration">所要時間</label>
+          <select id="task-duration">
+            <option value="">時間未設定</option>
+            <option value="15">15分</option>
+            <option value="30">30分</option>
+            <option value="45">45分</option>
+            <option value="60">1時間</option>
+            <option value="75">1時間15分</option>
+            <option value="90">1時間30分</option>
+            <option value="105">1時間45分</option>
+            <option value="120">2時間</option>
+            <option value="180">3時間</option>
+            <option value="240">4時間</option>
+          </select>
         </div>
         <div class="form-group timer-section" id="timer-section" style="display: none;">
           <label>累積時間</label>

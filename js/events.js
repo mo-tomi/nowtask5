@@ -3,17 +3,25 @@
 // ========================================
 
 function initEventListeners() {
-  // タブ切り替え
-  document.querySelectorAll('.tab-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      switchTab(btn.dataset.tab);
-    });
+  // ゴミ箱アイコン（タブUIを廃止したため、直接表示切替を行う）
+  document.getElementById('trash-icon-btn').addEventListener('click', () => {
+    showTrash();
   });
 
-  // ゴミ箱アイコン
-  document.getElementById('trash-icon-btn').addEventListener('click', () => {
-    switchTab('trash');
-  });
+  // 設定アイコン
+  function showTasks() {
+    document.getElementById('tasks-tab').classList.add('active');
+    document.getElementById('trash-tab').classList.remove('active');
+    const fab = document.getElementById('create-task-btn');
+    if (fab) fab.style.display = 'flex';
+  }
+
+  function showTrash() {
+    document.getElementById('tasks-tab').classList.remove('active');
+    document.getElementById('trash-tab').classList.add('active');
+    const fab = document.getElementById('create-task-btn');
+    if (fab) fab.style.display = 'none';
+  }
 
   // 設定アイコン
   document.getElementById('settings-icon-btn').addEventListener('click', () => {
@@ -170,34 +178,37 @@ function initEventListeners() {
   document.getElementById('add-subtask-btn').addEventListener('click', () => {
     addSubtask();
   });
-}
 
-// ========================================
-// タブ切り替え
-// ========================================
-function switchTab(tabName) {
-  currentTab = tabName;
+  // スクロール連動で24時間ゲージを更新（スロットリング）
+  const tasksListContainer = document.querySelector('.main-content');
+  if (tasksListContainer) {
+    let lastCall = 0;
+    const throttleMs = 150;
+    tasksListContainer.addEventListener('scroll', () => {
+      const now = Date.now();
+      if (now - lastCall < throttleMs) return;
+      lastCall = now;
 
-  // タブボタンの状態更新
-  document.querySelectorAll('.tab-button').forEach(btn => {
-    if (btn.dataset.tab === tabName) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
+      // 画面上部に見える最初の date-separator を探す
+      const separators = document.querySelectorAll('.date-separator');
+      let topMostDate = null;
+      let topMostOffset = Infinity;
+      separators.forEach(sep => {
+        const rect = sep.getBoundingClientRect();
+        // ビューポート上部付近（ヘッダーなどを考慮して 80px 下）にあるものを検出
+        const offset = Math.abs(rect.top - 80);
+        if (rect.top <= 120 && offset < topMostOffset) {
+          topMostOffset = offset;
+          topMostDate = sep.dataset.date || null;
+        }
+      });
 
-  // タブコンテンツの表示切り替え
-  document.querySelectorAll('.tab-content').forEach(content => {
-    content.classList.remove('active');
-  });
-  document.getElementById(tabName + '-tab').classList.add('active');
-
-  // FABの表示制御（ゴミ箱タブでは非表示）
-  const fab = document.getElementById('create-task-btn');
-  if (tabName === 'trash') {
-    fab.style.display = 'none';
-  } else {
-    fab.style.display = 'flex';
+      // 見つかった日付を渡してゲージを更新
+      if (topMostDate !== null) {
+        updateTimeGauge(topMostDate || undefined);
+      }
+    });
   }
 }
+
+// タブUIは廃止しました。表示切替は showTasks/showTrash を使用します。
