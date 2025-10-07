@@ -180,10 +180,16 @@ function initEventListeners() {
   // ---- 履歴セレクトの初期化とイベント ----
   function renderQuickHistory() {
     if (!quickHistorySelect) return;
-    // 既存オプションをクリア（先頭のプレースホルダは残す）
-    const placeholder = quickHistorySelect.querySelector('option');
+    // 全オプションをクリアし、プレースホルダーは再利用せず毎回新規作成する
+    // 既存の実装では既に削除された要素を再追加しようとしてプレースホルダが表示されない問題がありました。
     quickHistorySelect.innerHTML = '';
-    if (placeholder) quickHistorySelect.appendChild(placeholder);
+
+    // プレースホルダーを新規作成して追加（常に先頭に表示される）
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '履歴';
+    // 選択時に入力欄に何も入れないための空値
+    quickHistorySelect.appendChild(placeholder);
 
     // getTaskHistory は core.js にて実装
     const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
