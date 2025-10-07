@@ -55,6 +55,7 @@ function updateTimeGauge(dateArg) {
 // dateArg: Date オブジェクトか ISO 日付文字列（YYYY-MM-DD）。未指定なら今日を対象。
 function updateScheduledTasks(dateArg) {
   const tasks = getTasks();
+  // baseDate を対象日の 0:00 に設定
   let baseDate = new Date();
   baseDate.setHours(0, 0, 0, 0);
   if (dateArg) {
@@ -70,25 +71,26 @@ function updateScheduledTasks(dateArg) {
   const tomorrow = new Date(baseDate);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // baseDate の範囲にあるタスク、または期限なしだが所要時間があるタスクを抽出
+  // 変更点の説明（日本語コメント）:
+  // - 期限なしタスクはゲージに含めない（今日が期限のタスクのみ対象）
+  // - 完了済みタスクはゲージに含めない
+  // そのため、ここでは "dueDate が存在し、かつ baseDate の範囲内" のタスクのみを抽出する
   const todayTasks = tasks.filter(task => {
+    // 完了済みは除外
+    if (task.isCompleted) return false;
+
+    // 期限がある場合のみ、今日の範囲内かチェック
     if (task.dueDate) {
       const dueDate = new Date(task.dueDate);
       return dueDate >= baseDate && dueDate < tomorrow;
     }
-    return task.duration && task.duration > 0;
+
+    // 期限なしのタスクは除外
+    return false;
   });
 
-  // 未完了タスクのみ（予定ゲージ表示用）
-  const incompleteTasks = todayTasks.filter(task => !task.isCompleted);
-
-  // 全タスク（完了済み含む）の所要時間の合計を計算（分単位）
+  // 未完了タスクの所要時間の合計（分単位）。ここでは todayTasks は未完了のみとなる
   const totalDurationMinutes = todayTasks.reduce((sum, task) => {
-    return sum + (task.duration || 0);
-  }, 0);
-
-  // 未完了タスクの所要時間の合計（予定ゲージ表示用）
-  const incompleteDurationMinutes = incompleteTasks.reduce((sum, task) => {
     return sum + (task.duration || 0);
   }, 0);
 
@@ -96,25 +98,24 @@ function updateScheduledTasks(dateArg) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // 予定ゲージ更新（未完了タスクのみ）
+  // 予定ゲージ更新
   const scheduledBar = document.getElementById('time-gauge-scheduled');
-  if (incompleteDurationMinutes === 0) {
+  if (totalDurationMinutes === 0) {
     scheduledBar.style.display = 'none';
   } else {
     // ゲージの開始位置と幅を計算
     const startPercent = (currentMinutes / (24 * 60)) * 100;
-    const durationPercent = (incompleteDurationMinutes / (24 * 60)) * 100;
+    const durationPercent = (totalDurationMinutes / (24 * 60)) * 100;
 
     scheduledBar.style.display = 'block';
     scheduledBar.style.left = `${startPercent}%`;
-    scheduledBar.style.width = `${Math.min(durationPercent, 100 - startPercent)}%`; // 24時間を超えないように
+    scheduledBar.style.width = `${Math.min(durationPercent, 100 - startPercent)}%`;
   }
 
   // 自由時間を計算: 24時間 - 経過時間 - 予定タスク時間
-  const totalMinutesInDay = 24 * 60; // 1440分
+  const totalMinutesInDay = 24 * 60;
   const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
-  // 仕様に合わせ、予定タスク時間は未完了タスクのみを対象とする
-  const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - incompleteDurationMinutes;
+  const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - totalDurationMinutes;
 
   // 自由時間を表示
   const remainingElement = document.getElementById('remaining-tasks');
