@@ -38,8 +38,8 @@
         </button>
       </div>
     </div>
-    <div class="quick-add">
-      <input type="text" id="quick-add-input" placeholder="タスク名を入力してEnter" maxlength="100" autocomplete="off">
+    <form class="quick-add" id="quick-add-form">
+      <input type="text" id="quick-add-input" placeholder="タスク名を入力してEnter" maxlength="100" autocomplete="off" enterkeyhint="done">
       <div class="quick-add-controls">
         <button class="quick-date-btn" id="quick-date-btn" type="button" title="期限日時を設定">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -70,7 +70,7 @@
         </select>
       </div>
       <input type="datetime-local" id="quick-add-date" class="quick-date-input" style="display: none;">
-    </div>
+    </form>
   </header>
 
   <!-- タブナビゲーション -->

@@ -109,6 +109,7 @@ function initEventListeners() {
 
   // クイック入力
   const quickInput = document.getElementById('quick-add-input');
+  const quickAddForm = document.getElementById('quick-add-form');
   const quickDuration = document.getElementById('quick-add-duration');
   const quickDateBtn = document.getElementById('quick-date-btn');
   const quickDateInput = document.getElementById('quick-add-date');
@@ -140,8 +141,9 @@ function initEventListeners() {
     }
   });
 
-  quickInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && quickInput.value.trim()) {
+  quickAddForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (quickInput.value.trim()) {
       const title = quickInput.value.trim();
       const duration = quickDuration.value ? parseInt(quickDuration.value) : null;
 
@@ -163,7 +165,7 @@ function initEventListeners() {
       renderTasks();
     }
   });
-
+  
   // サブタスク追加ボタン
   document.getElementById('add-subtask-btn').addEventListener('click', () => {
     addSubtask();
