@@ -5,6 +5,74 @@
 // グローバル変数（インライン追加中のタスク）
 let addingSubtaskForTaskId = null;
 
+// 日付ごとにタスクをグループ化
+function groupTasksByDate(tasks) {
+  const groups = {};
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  tasks.forEach(task => {
+    let dateKey, label;
+
+    if (task.dueDate) {
+      const dueDate = new Date(task.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+
+      // 今日、明日、昨日、それ以外で判定
+      if (dueDate.getTime() === today.getTime()) {
+        dateKey = 'today';
+        label = '今日';
+      } else if (dueDate.getTime() === tomorrow.getTime()) {
+        dateKey = 'tomorrow';
+        label = '明日';
+      } else if (dueDate.getTime() === yesterday.getTime()) {
+        dateKey = 'yesterday';
+        label = '昨日';
+      } else if (dueDate < today) {
+        dateKey = 'overdue_' + dueDate.getTime();
+        label = formatDate(task.dueDate) + ' (期限切れ)';
+      } else {
+        dateKey = 'future_' + dueDate.getTime();
+        label = formatDate(task.dueDate);
+      }
+    } else {
+      dateKey = 'no_date';
+      label = '期限なし';
+    }
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = { date: dateKey, label, tasks: [], sortOrder: getSortOrder(dateKey, task.dueDate) };
+    }
+    groups[dateKey].tasks.push(task);
+  });
+
+  // ソート順序: 期限切れ → 昨日 → 今日 → 明日 → 未来 → 期限なし
+  return Object.values(groups).sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+function getSortOrder(dateKey, dueDate) {
+  if (dateKey.startsWith('overdue_')) return -1000 + new Date(dueDate).getTime();
+  if (dateKey === 'yesterday') return -2;
+  if (dateKey === 'today') return -1;
+  if (dateKey === 'tomorrow') return 0;
+  if (dateKey.startsWith('future_')) return 1000 + new Date(dueDate).getTime();
+  return 10000; // 期限なし
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+  const weekday = weekdays[date.getDay()];
+  return `${month}月${day}日 (${weekday})`;
+}
+
 // タスクリスト表示
 function renderTasks() {
   const tasks = getTasks();
@@ -22,8 +90,26 @@ function renderTasks() {
     tasksEmpty.classList.add('show');
   } else {
     tasksEmpty.classList.remove('show');
-    activeTasks.forEach(task => {
-      renderTaskWithSubtasks(task, tasksList, false);
+
+    // 日付ごとにタスクをグループ化
+    const tasksByDate = groupTasksByDate(activeTasks);
+
+    // 日付順にレンダリング
+    tasksByDate.forEach(({ date, label, tasks: dateTasks }) => {
+      // 日付セパレーター
+      const dateSeparator = document.createElement('div');
+      dateSeparator.className = 'date-separator';
+      dateSeparator.innerHTML = `
+        <div class="date-separator-line"></div>
+        <div class="date-separator-label">${label}</div>
+        <div class="date-separator-line"></div>
+      `;
+      tasksList.appendChild(dateSeparator);
+
+      // タスクをレンダリング
+      dateTasks.forEach(task => {
+        renderTaskWithSubtasks(task, tasksList, false);
+      });
     });
   }
 
@@ -107,6 +193,7 @@ function createTaskElement(task, level = 0) {
     div.classList.add(`level-${level}`);
   }
   div.dataset.id = task.id;
+  div.dataset.taskId = task.id;
   div.dataset.level = level;
 
   // チェックボックス

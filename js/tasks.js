@@ -162,7 +162,20 @@ function toggleTaskCompletion(id) {
   }
 
   updateTask(id, { isCompleted: !task.isCompleted });
-  renderTasks();
+
+  // アニメーション付きで再レンダリング
+  const taskElement = document.querySelector(`[data-task-id="${id}"]`);
+  if (taskElement && !task.isCompleted) {
+    // 完了にする場合のアニメーション
+    taskElement.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    taskElement.style.opacity = '0.5';
+    taskElement.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      renderTasks();
+    }, 400);
+  } else {
+    renderTasks();
+  }
 }
 
 // ========================================

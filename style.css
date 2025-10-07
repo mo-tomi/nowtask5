@@ -233,7 +233,7 @@ body {
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .time-gauge-header {
@@ -271,8 +271,8 @@ body {
 
 .time-gauge {
   position: relative;
-  height: 32px;
-  border-radius: 16px;
+  height: 40px;
+  border-radius: 20px;
   overflow: hidden;
   margin-bottom: 8px;
 }
@@ -374,19 +374,68 @@ body {
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
+}
+
+/* 日付セパレーター */
+.date-separator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0 20px;
+}
+
+.date-separator:first-child {
+  margin-top: 0;
+}
+
+.date-separator-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+}
+
+.date-separator-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  padding: 4px 16px;
+  background: #f5f5f5;
+  border-radius: 16px;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
 .task-item {
   background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
+  animation: taskFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-item:not(.subtask):not(.level-1):not(.level-2):not(.level-3):not(.level-4) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.task-item:not(.subtask):not(.level-1):not(.level-2):not(.level-3):not(.level-4):hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes taskFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .task-item.subtask {
@@ -397,26 +446,30 @@ body {
 /* 階層別インデント */
 .task-item.level-1 {
   margin-left: 24px;
+  border-left: 3px solid #333333;
+  background: #fafafa;
 }
 
 .task-item.level-2 {
   margin-left: 48px;
-  border-left-color: #666666;
+  border-left: 2px solid #666666;
+  background: #f5f5f5;
 }
 
 .task-item.level-3 {
   margin-left: 72px;
-  border-left-color: #999999;
+  border-left: 1px solid #999999;
+  background: #f0f0f0;
 }
 
 .task-item.level-4 {
   margin-left: 96px;
-  border-left-color: #cccccc;
+  border-left: 1px solid #cccccc;
+  background: #eeeeee;
 }
 
 .task-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.01);
 }
 
 .task-item.tutorial {
@@ -429,6 +482,24 @@ body {
   height: 20px;
   cursor: pointer;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.task-checkbox:hover {
+  transform: scale(1.15);
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.task-checkbox:checked {
+  animation: checkBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
 }
 
 .task-content {
@@ -439,52 +510,72 @@ body {
 .task-title {
   font-size: 16px;
   font-weight: 500;
-  margin-bottom: 4px;
+  line-height: 1.4;
+  margin-bottom: 8px;
   word-wrap: break-word;
 }
 
 .task-item.completed .task-title {
   text-decoration: line-through;
   color: #9e9e9e;
+  opacity: 0.6;
 }
 
 .task-meta {
-  font-size: 13px;
+  font-size: 12px;
   color: #757575;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
 .task-memo {
   color: #616161;
   font-size: 14px;
-  margin-top: 6px;
+  margin-top: 8px;
   white-space: pre-wrap;
   word-wrap: break-word;
+  line-height: 1.6;
 }
 
 .task-due-date {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
 }
 
 .task-due-date.overdue {
   color: #000000;
   font-weight: 500;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .task-timer {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
 }
 
 .task-timer.running {
   color: #000000;
   font-weight: 500;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.task-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
 }
 
 .task-actions {
@@ -627,13 +718,16 @@ body {
    ======================================== */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   color: #9e9e9e;
   display: none;
 }
 
 .empty-state.show {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ========================================
@@ -713,7 +807,7 @@ body {
   background-color: #000000;
   color: white;
   border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -724,7 +818,7 @@ body {
 
 .fab:hover {
   background-color: #333333;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   transform: scale(1.1);
 }
 
@@ -756,13 +850,13 @@ body {
 
 .modal-content {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  animation: modalSlideIn 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .confirm-modal {
@@ -986,12 +1080,16 @@ body {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+}
+
+.btn:hover {
+  transform: scale(1.05);
 }
 
 .btn-primary {
