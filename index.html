@@ -41,6 +41,10 @@
     <form class="quick-add" id="quick-add-form">
       <input type="text" id="quick-add-input" placeholder="タスク名を入力してEnter" maxlength="100" autocomplete="off" enterkeyhint="done">
       <div class="quick-add-controls">
+        <!-- 履歴ドロップダウン（右側） -->
+        <select id="quick-add-history" class="quick-add-history" title="過去の入力">
+          <option value="">履歴</option>
+        </select>
         <button class="quick-date-btn" id="quick-date-btn" type="button" title="期限日時を設定">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>

@@ -121,6 +121,7 @@ function initEventListeners() {
   const quickDuration = document.getElementById('quick-add-duration');
   const quickDateBtn = document.getElementById('quick-date-btn');
   const quickDateInput = document.getElementById('quick-add-date');
+  const quickHistorySelect = document.getElementById('quick-add-history');
 
   // カレンダーボタンのクリック
   quickDateBtn.addEventListener('click', (e) => {
@@ -166,6 +167,8 @@ function initEventListeners() {
 
       createTask(title, '', dueDate, null, false, duration);
       quickInput.value = '';
+      // 履歴セレクトを先頭表示に戻す
+      if (quickHistorySelect) quickHistorySelect.selectedIndex = 0;
       quickDuration.value = '';
       quickDateInput.value = '';
       quickDateInput.style.display = 'none';
@@ -173,6 +176,46 @@ function initEventListeners() {
       renderTasks();
     }
   });
+
+  // ---- 履歴セレクトの初期化とイベント ----
+  function renderQuickHistory() {
+    if (!quickHistorySelect) return;
+    // 既存オプションをクリア（先頭のプレースホルダは残す）
+    const placeholder = quickHistorySelect.querySelector('option');
+    quickHistorySelect.innerHTML = '';
+    if (placeholder) quickHistorySelect.appendChild(placeholder);
+
+    // getTaskHistory は core.js にて実装
+    const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
+    history.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      quickHistorySelect.appendChild(opt);
+    });
+  }
+
+  if (quickHistorySelect) {
+    // 初期描画
+    renderQuickHistory();
+
+    // 履歴選択時に入力欄へ自動入力（選択をクリアしない）
+    quickHistorySelect.addEventListener('change', (e) => {
+      const val = e.target.value || '';
+      if (val) {
+        quickInput.value = val;
+        // フォーカスを入力欄に移す
+        quickInput.focus();
+      }
+    });
+
+    // 履歴はタスク作成時に更新されるため、ページ内で履歴が変わったら再描画する必要がある。
+    // 単純実装として、タスク追加処理（createTask）が呼ばれた後に renderTasks が実行されるので
+    // renderTasks の中で再描画する実装がない場合は、ここでカスタムイベントを利用して再描画を行う。
+    document.addEventListener('task:history:updated', () => {
+      renderQuickHistory();
+    });
+  }
   
   // サブタスク追加ボタン
   document.getElementById('add-subtask-btn').addEventListener('click', () => {

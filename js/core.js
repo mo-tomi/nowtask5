@@ -7,6 +7,8 @@ const STORAGE_KEYS = {
   SORT_PREFERENCE: 'nowtask_sort_pref',
   SETTINGS: 'nowtask_settings',
   ROUTINES: 'nowtask_routines'
+  // 履歴用キー（最新20件を保存）
+  ,TASK_HISTORY: 'nowtask_task_history'
 };
 
 const TRASH_RETENTION_DAYS = 30;
@@ -16,6 +18,36 @@ const TRASH_RETENTION_DAYS = 30;
 // ========================================
 let currentTab = 'tasks';
 let editingTaskId = null;
+// ========================================
+// 履歴管理（クイック入力で使う過去のタイトル）
+// ========================================
+// 履歴を取得（配列、最新が先頭）
+function getTaskHistory(limit = 20) {
+  return loadFromStorage(STORAGE_KEYS.TASK_HISTORY, []).slice(0, limit);
+}
+
+// 履歴を丸ごと保存
+function saveTaskHistory(list) {
+  // 最新が先頭であることを期待する
+  const toSave = Array.isArray(list) ? list.slice(0, 20) : [];
+  return saveToStorage(STORAGE_KEYS.TASK_HISTORY, toSave);
+}
+
+// タイトルを履歴に追加（重複は削除、最新を先頭に、最大 limit 件）
+function addToTaskHistory(title, limit = 20) {
+  if (!title || typeof title !== 'string') return false;
+  const trimmed = title.trim();
+  if (trimmed.length === 0) return false;
+
+  const history = loadFromStorage(STORAGE_KEYS.TASK_HISTORY, []);
+  // 既存の同一エントリを取り除く（大文字小文字を区別しない）
+  const normalized = history.filter(item => item.toLowerCase() !== trimmed.toLowerCase());
+  // 先頭に追加
+  normalized.unshift(trimmed);
+  // 上限を超えたら切り詰め
+  const limited = normalized.slice(0, limit);
+  return saveToStorage(STORAGE_KEYS.TASK_HISTORY, limited);
+}
 let timerInterval = null;
 let editingSubtasks = [];
 

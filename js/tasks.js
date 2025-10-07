@@ -71,6 +71,18 @@ function createTask(title, memo = '', dueDate = null, parentId = null, isTutoria
   const tasks = getTasks();
   tasks.unshift(task);
   saveTasks(tasks);
+  // タスクタイトルを履歴に追加（core.js の addToTaskHistory を使用）
+  if (typeof addToTaskHistory === 'function') {
+    addToTaskHistory(task.title, 20);
+    // 履歴が更新されたことを通知するカスタムイベント
+    try {
+      document.dispatchEvent(new CustomEvent('task:history:updated'));
+    } catch (e) {
+      // 古いブラウザでは CustomEvent が機能しない場合があるが、致命的ではない
+      console.warn('CustomEvent dispatch failed for task:history:updated', e);
+    }
+  }
+
   return task;
 }
 

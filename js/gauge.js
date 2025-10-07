@@ -113,7 +113,8 @@ function updateScheduledTasks(dateArg) {
   // 自由時間を計算: 24時間 - 経過時間 - 予定タスク時間
   const totalMinutesInDay = 24 * 60; // 1440分
   const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
-  const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - totalDurationMinutes;
+  // 仕様に合わせ、予定タスク時間は未完了タスクのみを対象とする
+  const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - incompleteDurationMinutes;
 
   // 自由時間を表示
   const remainingElement = document.getElementById('remaining-tasks');
