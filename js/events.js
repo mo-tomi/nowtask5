@@ -3,6 +3,11 @@
 // ========================================
 
 function initEventListeners() {
+  // アプリタイトルクリックでタスク一覧に戻る
+  document.getElementById('app-title-btn').addEventListener('click', () => {
+    showTasks();
+  });
+
   // ゴミ箱アイコン（タブUIを廃止したため、直接表示切替を行う）
   document.getElementById('trash-icon-btn').addEventListener('click', () => {
     showTrash();
