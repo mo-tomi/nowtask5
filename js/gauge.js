@@ -286,50 +286,60 @@ function updateScheduledTasks(dateArg) {
     return false;
   });
 
-  // 開始時刻・終了時刻を使用したタスクの当日分の所要時間を計算
+  // 現在時刻（分単位）
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // 【重要】これから先のタスク時間のみ計算
   let totalDurationMinutes = 0;
 
   todayTasks.forEach(task => {
     if (task.startTime && task.endTime) {
-      // 開始時刻と終了時刻が指定されている場合
       const [startHour, startMin] = task.startTime.split(':').map(Number);
       const [endHour, endMin] = task.endTime.split(':').map(Number);
-
       const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
+      let endMinutes = endHour * 60 + endMin;
 
+      // 日をまたぐ場合
       if (endMinutes < startMinutes) {
-        // 日をまたぐ場合: 当日は開始時刻から24:00まで
-        totalDurationMinutes += (24 * 60) - startMinutes;
-      } else {
-        // 同日内の場合
-        totalDurationMinutes += endMinutes - startMinutes;
+        endMinutes = 24 * 60;
       }
+
+      // 現在時刻より後のタスクのみカウント
+      if (endMinutes > currentMinutes) {
+        if (startMinutes >= currentMinutes) {
+          // まだ始まっていないタスク: 全時間をカウント
+          totalDurationMinutes += endMinutes - startMinutes;
+        } else {
+          // 現在進行中のタスク: 残り時間のみカウント
+          totalDurationMinutes += endMinutes - currentMinutes;
+        }
+      }
+      // 既に終わったタスク（endMinutes <= currentMinutes）はカウントしない
+
     } else if (task.duration) {
-      // 開始・終了時刻が未設定の場合はdurationを使用
+      // duration のみの場合は「これから」やる想定でカウント
       totalDurationMinutes += task.duration;
     }
   });
 
-  // 前日から日をまたいで当日に継続するタスクの翌日分を加算
+  // 前日から継続するタスク（今日の0:00以降の部分のみ）
   yesterdayTasks.forEach(task => {
     if (task.startTime && task.endTime) {
       const [startHour, startMin] = task.startTime.split(':').map(Number);
       const [endHour, endMin] = task.endTime.split(':').map(Number);
-
       const startMinutes = startHour * 60 + startMin;
       const endMinutes = endHour * 60 + endMin;
 
       if (endMinutes < startMinutes) {
-        // 日をまたぐ場合: 当日は0:00から終了時刻まで
-        totalDurationMinutes += endMinutes;
+        // 日をまたぐタスクの今日分
+        if (endMinutes > currentMinutes) {
+          // まだ終わっていない
+          totalDurationMinutes += endMinutes - Math.max(0, currentMinutes);
+        }
       }
     }
   });
-
-  // 現在時刻から開始して、未完了タスクの所要時間分のゲージを表示
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // 予定ゲージ更新（時間帯ごとに個別のブロックを作成）
   const scheduledBar = document.getElementById('time-gauge-scheduled');
@@ -407,10 +417,11 @@ function updateScheduledTasks(dateArg) {
     scheduledBar.appendChild(blockEl);
   });
 
-  // 自由時間を計算: 24時間 - 経過時間 - 予定タスク時間
+  // 【修正】空き時間と密度の計算
   const totalMinutesInDay = 24 * 60;
   const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
-  const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - totalDurationMinutes;
+  const remainingTimeInDay = totalMinutesInDay - currentMinutesFromMidnight; // これから先の時間
+  const freeTimeMinutes = remainingTimeInDay - totalDurationMinutes; // 空き時間
 
   // 自由時間ゲージ更新
   const freeBar = document.getElementById('time-gauge-free');
@@ -428,20 +439,17 @@ function updateScheduledTasks(dateArg) {
   const remainingElement = document.getElementById('remaining-tasks');
   const gaugeContainer = document.querySelector('.time-gauge-container');
 
-  // 密度 = タスク時間 / 残り時間（経過時刻から24時まで）
-  const remainingTimeInDay = totalMinutesInDay - currentMinutesFromMidnight;
+  // 【修正】密度 = これから先のタスク時間 / これから先の時間
   const densityPercent = remainingTimeInDay > 0 ? (totalDurationMinutes / remainingTimeInDay) * 100 : 100;
 
   // 密度レベルを判定
-  let densityLevel = 'green'; // デフォルト: 余裕あり
+  let densityLevel = 'green';
   let densityEmoji = '🟢';
 
   if (densityPercent >= 100) {
-    // レッド警報: タスクびっしり、無理がある
     densityLevel = 'red';
     densityEmoji = '🔴';
   } else if (densityPercent >= 70) {
-    // イエロー警報: タスク多め、頑張れば終わる
     densityLevel = 'yellow';
     densityEmoji = '🟡';
   }
@@ -450,28 +458,28 @@ function updateScheduledTasks(dateArg) {
   gaugeContainer.classList.remove('density-green', 'density-yellow', 'density-red');
   gaugeContainer.classList.add(`density-${densityLevel}`);
 
-  // 自由時間を表示
+  // 【修正】分かりやすい表示
   if (freeTimeMinutes < 0) {
-    // 予定がオーバーしている場合
+    // タスクが多すぎる場合
     const overMinutes = Math.abs(freeTimeMinutes);
     const overHours = Math.floor(overMinutes / 60);
     const overMins = overMinutes % 60;
     if (overHours > 0) {
-      remainingElement.textContent = `${densityEmoji} 超過: ${overHours}時間${overMins > 0 ? overMins + '分' : ''}`;
+      remainingElement.textContent = `${densityEmoji} 時間オーバー: ${overHours}時間${overMins > 0 ? overMins + '分' : ''}`;
     } else {
-      remainingElement.textContent = `${densityEmoji} 超過: ${overMins}分`;
+      remainingElement.textContent = `${densityEmoji} 時間オーバー: ${overMins}分`;
     }
   } else {
-    // 自由時間を表示
+    // 空き時間を表示
     const hours = Math.floor(freeTimeMinutes / 60);
     const minutes = freeTimeMinutes % 60;
 
     if (hours > 0) {
-      remainingElement.textContent = `${densityEmoji} 自由: ${hours}時間${minutes > 0 ? minutes + '分' : ''}`;
+      remainingElement.textContent = `${densityEmoji} 空き時間: ${hours}時間${minutes > 0 ? minutes + '分' : ''}`;
     } else if (minutes > 0) {
-      remainingElement.textContent = `${densityEmoji} 自由: ${minutes}分`;
+      remainingElement.textContent = `${densityEmoji} 空き時間: ${minutes}分`;
     } else {
-      remainingElement.textContent = `${densityEmoji} 自由: 0分`;
+      remainingElement.textContent = `${densityEmoji} ぴったり（余裕なし）`;
     }
   }
 }
