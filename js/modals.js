@@ -366,6 +366,22 @@ function renderRoutinesList() {
     nameInput.maxLength = 50;
     nameInput.dataset.index = index;
 
+    // 詳細設定ボタン
+    const detailBtn = document.createElement('button');
+    detailBtn.type = 'button';
+    detailBtn.className = 'routine-detail-btn';
+    detailBtn.textContent = '⏰';
+    detailBtn.title = '時刻設定';
+    detailBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const detailPanel = item.querySelector('.routine-detail-panel');
+      if (detailPanel.style.display === 'none') {
+        detailPanel.style.display = 'flex';
+      } else {
+        detailPanel.style.display = 'none';
+      }
+    });
+
     const durationInput = document.createElement('select');
     durationInput.className = 'routine-duration-input';
     durationInput.dataset.index = index;
@@ -406,9 +422,40 @@ function renderRoutinesList() {
       deleteRoutine(index);
     });
 
+    // 詳細パネル（開始時刻・終了時刻）
+    const detailPanel = document.createElement('div');
+    detailPanel.className = 'routine-detail-panel';
+    detailPanel.style.display = 'none';
+
+    const startTimeLabel = document.createElement('label');
+    startTimeLabel.textContent = '開始:';
+    const startTimeInput = document.createElement('input');
+    startTimeInput.type = 'time';
+    startTimeInput.className = 'routine-time-input';
+    startTimeInput.value = routine.startTime || '';
+    startTimeInput.dataset.index = index;
+    startTimeInput.dataset.field = 'startTime';
+
+    const endTimeLabel = document.createElement('label');
+    endTimeLabel.textContent = '終了:';
+    const endTimeInput = document.createElement('input');
+    endTimeInput.type = 'time';
+    endTimeInput.className = 'routine-time-input';
+    endTimeInput.value = routine.endTime || '';
+    endTimeInput.dataset.index = index;
+    endTimeInput.dataset.field = 'endTime';
+
+    detailPanel.appendChild(startTimeLabel);
+    detailPanel.appendChild(startTimeInput);
+    detailPanel.appendChild(endTimeLabel);
+    detailPanel.appendChild(endTimeInput);
+
+    // アイテムに追加
     item.appendChild(nameInput);
     item.appendChild(durationInput);
+    item.appendChild(detailBtn);
     item.appendChild(deleteBtn);
+    item.appendChild(detailPanel);
     container.appendChild(item);
   });
   } catch (e) {
@@ -473,14 +520,31 @@ function saveSettings() {
   const routines = [];
   const nameInputs = document.querySelectorAll('.routine-name-input');
   const durationInputs = document.querySelectorAll('.routine-duration-input');
+  const timeInputs = document.querySelectorAll('.routine-time-input');
 
   nameInputs.forEach((nameInput, index) => {
     const name = nameInput.value.trim();
     if (name) {
+      // 開始時刻と終了時刻を取得
+      let startTime = '';
+      let endTime = '';
+      timeInputs.forEach(input => {
+        const inputIndex = parseInt(input.dataset.index);
+        if (inputIndex === index) {
+          if (input.dataset.field === 'startTime') {
+            startTime = input.value || '';
+          } else if (input.dataset.field === 'endTime') {
+            endTime = input.value || '';
+          }
+        }
+      });
+
       const routine = {
         id: getRoutines()[index]?.id || generateUUID(),
         name: name,
-        duration: parseInt(durationInputs[index].value)
+        duration: parseInt(durationInputs[index].value),
+        startTime: startTime,
+        endTime: endTime
       };
       routines.push(routine);
     }

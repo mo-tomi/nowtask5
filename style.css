@@ -1135,6 +1135,7 @@ body {
   border-radius: 8px;
   padding: 16px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -1214,6 +1215,60 @@ body {
 
 .btn-add-routine:active {
   transform: scale(0.98);
+}
+
+.routine-detail-btn {
+  background: rgba(33, 150, 243, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #2196F3;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.routine-detail-btn:hover {
+  background: rgba(33, 150, 243, 0.2);
+  transform: scale(1.1);
+}
+
+.routine-detail-btn:active {
+  transform: scale(0.95);
+}
+
+.routine-detail-panel {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 8px;
+}
+
+.routine-detail-panel label {
+  font-size: 13px;
+  color: #757575;
+  font-weight: 500;
+}
+
+.routine-time-input {
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  outline: none;
+}
+
+.routine-time-input:focus {
+  border-color: #2196F3;
 }
 
 /* ========================================
