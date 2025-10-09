@@ -14,9 +14,9 @@
   <link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="description" content="モノクロデザインのシンプルなタスク管理アプリ">
 
-  <link rel="stylesheet" href="css/style-base.css?v=8">
-  <link rel="stylesheet" href="css/style-components.css?v=8">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="css/style-base.css?v=9">
+  <link rel="stylesheet" href="css/style-components.css?v=9">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <!-- ヘッダー -->
@@ -31,6 +31,13 @@
             <path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path>
             <path d="M1 12h6m6 0h6"></path>
             <path d="m4.93 19.07 4.24-4.24m5.66-5.66 4.24-4.24"></path>
+          </svg>
+        </button>
+        <button class="shelf-icon-btn" id="shelf-icon-btn" aria-label="棚上げ" title="棚上げ">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+            <line x1="2" y1="16" x2="22" y2="16"></line>
           </svg>
         </button>
         <button class="trash-icon-btn" id="trash-icon-btn" aria-label="ゴミ箱" title="ゴミ箱">
@@ -185,6 +192,20 @@
       </div>
     </div>
 
+    <!-- 棚上げリスト -->
+    <div class="tab-content" id="shelf-tab">
+      <div id="shelf-list" class="task-list"></div>
+      <div class="empty-state" id="shelf-empty">
+        <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="#d0d0d0" stroke-width="2" style="margin: 0 auto 24px;">
+          <rect x="20" y="25" width="60" height="50" rx="4"></rect>
+          <line x1="20" y1="40" x2="80" y2="40"></line>
+          <line x1="20" y1="55" x2="80" y2="55"></line>
+        </svg>
+        <p style="font-size: 18px; font-weight: 500; margin-bottom: 12px; color: #9e9e9e;">棚上げタスクはありません</p>
+        <small style="font-size: 14px; color: #bdbdbd;">「今はできないけど、いつかやりたい」タスクを保管できます</small>
+      </div>
+    </div>
+
     <!-- ゴミ箱リスト -->
     <div class="tab-content" id="trash-tab">
       <div id="trash-list" class="task-list"></div>
@@ -334,13 +355,13 @@
     </div>
   </div>
 
-  <script src="js/core.js?v=8"></script>
-  <script src="js/tasks.js?v=8"></script>
-  <script src="js/render.js?v=8"></script>
-  <script src="js/modals.js?v=8"></script>
-  <script src="js/gauge.js?v=8"></script>
-  <script src="js/events.js?v=8"></script>
-  <script src="js/ui-main.js?v=8"></script>
+  <script src="js/core.js?v=9"></script>
+  <script src="js/tasks.js?v=9"></script>
+  <script src="js/render.js?v=9"></script>
+  <script src="js/modals.js?v=9"></script>
+  <script src="js/gauge.js?v=9"></script>
+  <script src="js/events.js?v=9"></script>
+  <script src="js/ui-main.js?v=9"></script>
 
   <!-- Service Worker登録 -->
   <script>

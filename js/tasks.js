@@ -154,6 +154,45 @@ function permanentDelete(id) {
   return true;
 }
 
+// タスクを棚上げ
+function shelveTask(id) {
+  const tasks = getTasks();
+  const index = tasks.findIndex(task => task.id === id);
+
+  if (index === -1) return false;
+
+  const shelvedTask = tasks.splice(index, 1)[0];
+
+  // 棚上げリストに追加
+  const shelved = loadFromStorage(STORAGE_KEYS.SHELVED, []);
+  shelved.unshift({
+    ...shelvedTask,
+    shelvedAt: new Date().toISOString()
+  });
+  saveToStorage(STORAGE_KEYS.SHELVED, shelved);
+
+  saveTasks(tasks);
+  return true;
+}
+
+// 棚上げから復帰
+function unshelveTask(id) {
+  const shelved = loadFromStorage(STORAGE_KEYS.SHELVED, []);
+  const index = shelved.findIndex(task => task.id === id);
+
+  if (index === -1) return false;
+
+  const restoredTask = shelved.splice(index, 1)[0];
+  delete restoredTask.shelvedAt;
+
+  const tasks = getTasks();
+  tasks.unshift(restoredTask);
+
+  saveToStorage(STORAGE_KEYS.SHELVED, shelved);
+  saveTasks(tasks);
+  return true;
+}
+
 // ゴミ箱クリーンアップ（30日以上経過したタスクを削除）
 function cleanupTrash() {
   const trash = loadFromStorage(STORAGE_KEYS.TRASH, []);
