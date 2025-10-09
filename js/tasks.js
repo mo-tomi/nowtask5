@@ -216,21 +216,65 @@ function toggleTaskCompletion(id) {
     stopTimer(id);
   }
 
+  const wasCompleted = task.isCompleted;
   updateTask(id, { isCompleted: !task.isCompleted });
 
   // アニメーション付きで再レンダリング
   const taskElement = document.querySelector(`[data-task-id="${id}"]`);
-  if (taskElement && !task.isCompleted) {
+  if (taskElement && !wasCompleted) {
     // 完了にする場合のアニメーション
     taskElement.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
     taskElement.style.opacity = '0.5';
     taskElement.style.transform = 'scale(0.98)';
     setTimeout(() => {
       renderTasks();
+      // 完了後に「元に戻す」ボタンを表示
+      showUndoButton(id, task.title);
     }, 400);
   } else {
     renderTasks();
   }
+}
+
+// 元に戻すボタンを表示
+function showUndoButton(taskId, taskTitle) {
+  // 既存の元に戻すボタンを削除
+  const existingUndo = document.querySelector('.undo-toast');
+  if (existingUndo) {
+    existingUndo.remove();
+  }
+
+  // 元に戻すトーストを作成
+  const toast = document.createElement('div');
+  toast.className = 'undo-toast';
+  toast.innerHTML = `
+    <div class="undo-toast-content">
+      <span class="undo-toast-text">「${taskTitle}」を完了しました</span>
+      <button class="undo-btn">元に戻す</button>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  // ボタンクリックイベント
+  const undoBtn = toast.querySelector('.undo-btn');
+  undoBtn.addEventListener('click', () => {
+    toggleTaskCompletion(taskId);
+    toast.remove();
+  });
+
+  // アニメーション表示
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+
+  // 5秒後に自動的に非表示
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 5000);
 }
 
 // ========================================
