@@ -38,10 +38,52 @@ function init() {
         renderTasks();
       }
     }, 1000);
+
+    // スクロール時にヘッダーを隠す
+    initHeaderScroll();
   } catch (e) {
     console.error('Initialization error:', e);
     alert('初期化エラーが発生しました。コンソールを確認してください。');
   }
+}
+
+// ========================================
+// ヘッダースクロール制御
+// ========================================
+function initHeaderScroll() {
+  const header = document.querySelector('.header');
+  let lastScrollTop = 0;
+  let isScrolling = false;
+  let scrollTimeout;
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // スクロールが停止したかチェック
+    clearTimeout(scrollTimeout);
+    isScrolling = true;
+
+    // 下スクロール: ヘッダーを隠す
+    if (currentScroll > lastScrollTop && currentScroll > 100) {
+      header.classList.add('header-hidden');
+    }
+    // 上スクロール: ヘッダーを表示
+    else if (currentScroll < lastScrollTop) {
+      header.classList.remove('header-hidden');
+    }
+
+    // トップに戻った場合は必ず表示
+    if (currentScroll <= 0) {
+      header.classList.remove('header-hidden');
+    }
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+
+    // スクロール停止を検知（200ms後）
+    scrollTimeout = setTimeout(() => {
+      isScrolling = false;
+    }, 200);
+  }, { passive: true });
 }
 
 // DOMロード後に初期化実行
