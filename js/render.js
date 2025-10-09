@@ -467,6 +467,9 @@ function createTaskElement(task, level = 0) {
     }
   });
 
+  // ドラッグ&ドロップ機能
+  setupDragAndDrop(div, task);
+
   return div;
 }
 
@@ -572,4 +575,161 @@ function createSubtaskInputInline(parentId, parentLevel = 0) {
   setTimeout(() => input.focus(), 0);
 
   return div;
+}
+
+// ========================================
+// ドラッグ&ドロップ機能
+// ========================================
+let draggedElement = null;
+let longPressTimer = null;
+let isDragging = false;
+
+function setupDragAndDrop(element, task) {
+  let startY = 0;
+  let startX = 0;
+
+  // タッチデバイス用の長押し検出
+  element.addEventListener('touchstart', (e) => {
+    // チェックボックスやボタンの場合は無視
+    if (e.target.closest('.task-checkbox') || e.target.closest('.task-card-actions')) {
+      return;
+    }
+
+    const touch = e.touches[0];
+    startY = touch.clientY;
+    startX = touch.clientX;
+
+    // 500ms長押しでドラッグ開始
+    longPressTimer = setTimeout(() => {
+      isDragging = true;
+      draggedElement = element;
+      element.classList.add('dragging');
+      // 振動フィードバック（対応デバイスのみ）
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }, 500);
+  });
+
+  element.addEventListener('touchmove', (e) => {
+    if (longPressTimer) {
+      const touch = e.touches[0];
+      const moveY = Math.abs(touch.clientY - startY);
+      const moveX = Math.abs(touch.clientX - startX);
+      // 10px以上動いたら長押しキャンセル
+      if (moveY > 10 || moveX > 10) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+
+    if (isDragging && draggedElement) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const afterElement = getDragAfterElement(element.parentElement, touch.clientY);
+
+      if (afterElement == null) {
+        element.parentElement.appendChild(draggedElement);
+      } else {
+        element.parentElement.insertBefore(draggedElement, afterElement);
+      }
+    }
+  });
+
+  element.addEventListener('touchend', (e) => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+
+    if (isDragging && draggedElement) {
+      e.preventDefault();
+      element.classList.remove('dragging');
+
+      // 新しい順序を保存
+      saveNewTaskOrder();
+
+      isDragging = false;
+      draggedElement = null;
+    }
+  });
+
+  // PC用のドラッグ&ドロップ
+  element.setAttribute('draggable', 'true');
+
+  element.addEventListener('dragstart', (e) => {
+    // チェックボックスやボタンの場合は無視
+    if (e.target.closest('.task-checkbox') || e.target.closest('.task-card-actions')) {
+      e.preventDefault();
+      return;
+    }
+
+    draggedElement = element;
+    element.classList.add('dragging');
+  });
+
+  element.addEventListener('dragend', () => {
+    element.classList.remove('dragging');
+
+    // 新しい順序を保存
+    saveNewTaskOrder();
+
+    draggedElement = null;
+  });
+
+  element.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(element.parentElement, e.clientY);
+
+    if (draggedElement && draggedElement !== element) {
+      if (afterElement == null) {
+        element.parentElement.appendChild(draggedElement);
+      } else {
+        element.parentElement.insertBefore(draggedElement, afterElement);
+      }
+    }
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function saveNewTaskOrder() {
+  const tasks = getTasks();
+  const taskElements = document.querySelectorAll('.task-item:not(.completed)');
+
+  // 新しい順序でタスクIDを取得
+  const newOrder = [];
+  taskElements.forEach(el => {
+    const taskId = el.dataset.taskId;
+    if (taskId) {
+      newOrder.push(taskId);
+    }
+  });
+
+  // タスクの順序を更新（customOrder フィールドを追加）
+  tasks.forEach((task, index) => {
+    const newIndex = newOrder.indexOf(task.id);
+    if (newIndex !== -1) {
+      task.customOrder = newIndex;
+    }
+  });
+
+  // 保存
+  saveTasks(tasks);
+
+  // 再レンダリング
+  renderTasks();
 }
