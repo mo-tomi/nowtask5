@@ -9,7 +9,12 @@ function openCreateModal() {
   document.getElementById('modal-title').textContent = '新規タスク';
   document.getElementById('task-title').value = '';
   document.getElementById('task-memo').value = '';
-  document.getElementById('task-due-date').value = '';
+
+  // 今日の日付をデフォルトに設定
+  const today = new Date();
+  const localISO = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  document.getElementById('task-due-date').value = localISO;
+
   document.getElementById('task-duration').value = '';
   document.getElementById('task-start-time').value = '';
   document.getElementById('task-end-time').value = '';
