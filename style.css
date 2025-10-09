@@ -1584,3 +1584,64 @@ body {
     width: 100%;
   }
 }
+
+/* ========================================
+   タスクコンテキストメニュー
+   ======================================== */
+.task-context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.task-context-menu .menu-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-context-menu .menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.task-context-menu .menu-item:active {
+  background-color: #e0e0e0;
+}
+
+/* ========================================
+   時間記録停止ボタン
+   ======================================== */
+.timer-stop-btn {
+  background: rgba(244, 67, 54, 0.1);
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #f44336;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.timer-stop-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: scale(1.05);
+}
+
+.timer-stop-btn:active {
+  transform: scale(0.95);
+}

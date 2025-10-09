@@ -433,6 +433,20 @@ function createTaskElement(task, level = 0) {
   const actions = document.createElement('div');
   actions.className = 'task-card-actions';
 
+  // 時間記録停止ボタン（タイマー実行中のみ表示）
+  if (task.isTimerRunning) {
+    const stopBtn = document.createElement('button');
+    stopBtn.className = 'timer-stop-btn';
+    stopBtn.innerHTML = '⏹';
+    stopBtn.title = '時間記録停止';
+    stopBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      stopTaskTimer(task.id);
+      renderTasks();
+    });
+    actions.appendChild(stopBtn);
+  }
+
   // サブタスク追加ボタン（タスク内に表示）
   if (!task.isCompleted && canHaveSubtask(task.id)) {
     const addSubtaskIcon = document.createElement('button');
@@ -454,7 +468,7 @@ function createTaskElement(task, level = 0) {
   menuBtn.title = 'メニュー';
   menuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    openEditModal(task.id);
+    showTaskMenu(e, task);
   });
   actions.appendChild(menuBtn);
 
@@ -732,4 +746,67 @@ function saveNewTaskOrder() {
 
   // 再レンダリング
   renderTasks();
+}
+
+// ========================================
+// タスクメニュー
+// ========================================
+function showTaskMenu(event, task) {
+  // 既存のメニューを削除
+  const existingMenu = document.querySelector('.task-context-menu');
+  if (existingMenu) {
+    existingMenu.remove();
+  }
+
+  // メニューを作成
+  const menu = document.createElement('div');
+  menu.className = 'task-context-menu';
+
+  // 時間記録開始/停止ボタン
+  const timerItem = document.createElement('div');
+  timerItem.className = 'menu-item';
+  if (task.isTimerRunning) {
+    timerItem.textContent = '⏸️ 時間記録停止';
+    timerItem.addEventListener('click', () => {
+      stopTaskTimer(task.id);
+      menu.remove();
+      renderTasks();
+    });
+  } else {
+    timerItem.textContent = '▶️ 時間記録開始';
+    timerItem.addEventListener('click', () => {
+      startTaskTimer(task.id);
+      menu.remove();
+      renderTasks();
+    });
+  }
+  menu.appendChild(timerItem);
+
+  // 編集ボタン
+  const editItem = document.createElement('div');
+  editItem.className = 'menu-item';
+  editItem.textContent = '✏️ 編集';
+  editItem.addEventListener('click', () => {
+    openEditModal(task.id);
+    menu.remove();
+  });
+  menu.appendChild(editItem);
+
+  // メニューの位置を設定
+  const rect = event.target.getBoundingClientRect();
+  menu.style.position = 'fixed';
+  menu.style.top = `${rect.bottom + 5}px`;
+  menu.style.left = `${rect.left}px`;
+
+  document.body.appendChild(menu);
+
+  // メニュー外をクリックで閉じる
+  setTimeout(() => {
+    document.addEventListener('click', function closeMenu(e) {
+      if (!menu.contains(e.target)) {
+        menu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    });
+  }, 0);
 }

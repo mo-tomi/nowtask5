@@ -277,6 +277,16 @@ function stopTimer(taskId) {
   return true;
 }
 
+// タスク時間記録開始（render.jsから呼び出し用）
+function startTaskTimer(taskId) {
+  return startTimer(taskId);
+}
+
+// タスク時間記録停止（render.jsから呼び出し用）
+function stopTaskTimer(taskId) {
+  return stopTimer(taskId);
+}
+
 // タイマー表示更新
 function updateTimerDisplay(taskId) {
   const task = getTaskById(taskId);
