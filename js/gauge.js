@@ -71,6 +71,9 @@ function updateScheduledTasks(dateArg) {
   const tomorrow = new Date(baseDate);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
+  const yesterday = new Date(baseDate);
+  yesterday.setDate(yesterday.getDate() - 1);
+
   // 変更点の説明（日本語コメント）:
   // - 期限なしタスクはゲージに含めない（今日が期限のタスクのみ対象）
   // - 完了済みタスクはゲージに含めない
@@ -89,10 +92,56 @@ function updateScheduledTasks(dateArg) {
     return false;
   });
 
-  // 未完了タスクの所要時間の合計（分単位）。ここでは todayTasks は未完了のみとなる
-  const totalDurationMinutes = todayTasks.reduce((sum, task) => {
-    return sum + (task.duration || 0);
-  }, 0);
+  // 前日が期限で、日をまたぐタスクを抽出（翌日分として当日に加算）
+  const yesterdayTasks = tasks.filter(task => {
+    if (task.isCompleted) return false;
+    if (task.dueDate) {
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= yesterday && dueDate < baseDate;
+    }
+    return false;
+  });
+
+  // 開始時刻・終了時刻を使用したタスクの当日分の所要時間を計算
+  let totalDurationMinutes = 0;
+
+  todayTasks.forEach(task => {
+    if (task.startTime && task.endTime) {
+      // 開始時刻と終了時刻が指定されている場合
+      const [startHour, startMin] = task.startTime.split(':').map(Number);
+      const [endHour, endMin] = task.endTime.split(':').map(Number);
+
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      if (endMinutes < startMinutes) {
+        // 日をまたぐ場合: 当日は開始時刻から24:00まで
+        totalDurationMinutes += (24 * 60) - startMinutes;
+      } else {
+        // 同日内の場合
+        totalDurationMinutes += endMinutes - startMinutes;
+      }
+    } else if (task.duration) {
+      // 開始・終了時刻が未設定の場合はdurationを使用
+      totalDurationMinutes += task.duration;
+    }
+  });
+
+  // 前日から日をまたいで当日に継続するタスクの翌日分を加算
+  yesterdayTasks.forEach(task => {
+    if (task.startTime && task.endTime) {
+      const [startHour, startMin] = task.startTime.split(':').map(Number);
+      const [endHour, endMin] = task.endTime.split(':').map(Number);
+
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      if (endMinutes < startMinutes) {
+        // 日をまたぐ場合: 当日は0:00から終了時刻まで
+        totalDurationMinutes += endMinutes;
+      }
+    }
+  });
 
   // 現在時刻から開始して、未完了タスクの所要時間分のゲージを表示
   const now = new Date();
