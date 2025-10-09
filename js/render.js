@@ -401,17 +401,10 @@ function createTaskElement(task, level = 0) {
     timer.className = 'task-timer';
     if (task.isTimerRunning) {
       timer.classList.add('running');
+      timer.textContent = '⏱️ 計測中...';
+    } else {
+      timer.textContent = '⏱️ ' + formatTime(task.totalTime);
     }
-
-    let displayTime = task.totalTime;
-    if (task.isTimerRunning && task.timerStartTime) {
-      const startTime = new Date(task.timerStartTime);
-      const now = new Date();
-      const elapsedSeconds = Math.floor((now - startTime) / 1000);
-      displayTime = task.totalTime + elapsedSeconds;
-    }
-
-    timer.textContent = '⏱️ ' + formatTime(displayTime);
     meta.appendChild(timer);
   }
 
