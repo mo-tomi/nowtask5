@@ -14,9 +14,9 @@
   <link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="description" content="モノクロデザインのシンプルなタスク管理アプリ">
 
-  <link rel="stylesheet" href="css/style-base.css?v=12">
-  <link rel="stylesheet" href="css/style-components.css?v=12">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="css/style-base.css?v=13">
+  <link rel="stylesheet" href="css/style-components.css?v=13">
+  <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
   <!-- ヘッダー -->
@@ -115,11 +115,15 @@
     <!-- タスクリスト -->
     <div class="tab-content active" id="tasks-tab">
       <!-- 24時間ゲージ -->
-      <div class="time-gauge-container">
+      <div class="time-gauge-container" id="time-gauge-container">
         <div class="time-gauge-header">
-          <span class="current-time" id="current-time">00:00</span>
-          <span class="gauge-label">今日の予定</span>
-          <span class="remaining-tasks" id="remaining-tasks">残り: 0時間</span>
+          <button class="gauge-nav-btn" id="gauge-prev-btn">‹</button>
+          <div class="gauge-header-center">
+            <span class="current-time" id="current-time">00:00</span>
+            <span class="gauge-label" id="gauge-date-label">今日の予定</span>
+            <span class="remaining-tasks" id="remaining-tasks">残り: 0時間</span>
+          </div>
+          <button class="gauge-nav-btn" id="gauge-next-btn">›</button>
         </div>
         <div class="time-gauge">
           <div class="time-gauge-bg"></div>
@@ -355,13 +359,13 @@
     </div>
   </div>
 
-  <script src="js/core.js?v=12"></script>
-  <script src="js/tasks.js?v=12"></script>
-  <script src="js/render.js?v=12"></script>
-  <script src="js/modals.js?v=12"></script>
-  <script src="js/gauge.js?v=12"></script>
-  <script src="js/events.js?v=12"></script>
-  <script src="js/ui-main.js?v=12"></script>
+  <script src="js/core.js?v=13"></script>
+  <script src="js/tasks.js?v=13"></script>
+  <script src="js/render.js?v=13"></script>
+  <script src="js/modals.js?v=13"></script>
+  <script src="js/gauge.js?v=13"></script>
+  <script src="js/events.js?v=13"></script>
+  <script src="js/ui-main.js?v=13"></script>
 
   <!-- Service Worker登録 -->
   <script>

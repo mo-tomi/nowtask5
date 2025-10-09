@@ -27,8 +27,19 @@ function init() {
     renderTasks();
 
     // 24時間ゲージの初期化と更新
-    updateTimeGauge();
-    setInterval(updateTimeGauge, 60000); // 1分ごとに更新
+    initGaugeDate();
+    initGaugeSwipe();
+    updateTimeGauge(currentGaugeDate);
+    updateGaugeDateLabel();
+    setInterval(() => {
+      // 現在の日付が変わっていたら今日にリセット
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayISO = formatDateISO(today);
+      if (currentGaugeDate === todayISO) {
+        updateTimeGauge(currentGaugeDate);
+      }
+    }, 60000); // 1分ごとに更新
 
     // 1秒ごとにタスクリストを更新（タイマー表示のため）
     setInterval(() => {

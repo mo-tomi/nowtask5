@@ -2,6 +2,108 @@
 // 24時間ゲージ
 // ========================================
 
+// 現在表示中の日付（ISO形式: YYYY-MM-DD）
+let currentGaugeDate = null;
+
+// ゲージの日付を初期化
+function initGaugeDate() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  currentGaugeDate = formatDateISO(today);
+}
+
+// ゲージの日付を変更
+function changeGaugeDate(offset) {
+  if (!currentGaugeDate) initGaugeDate();
+
+  const date = new Date(currentGaugeDate);
+  date.setDate(date.getDate() + offset);
+  currentGaugeDate = formatDateISO(date);
+
+  updateTimeGauge(currentGaugeDate);
+  updateGaugeDateLabel();
+}
+
+// 日付ラベルを更新
+function updateGaugeDateLabel() {
+  const labelEl = document.getElementById('gauge-date-label');
+  if (!labelEl || !currentGaugeDate) return;
+
+  const date = new Date(currentGaugeDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (formatDateISO(date) === formatDateISO(today)) {
+    labelEl.textContent = '今日の予定';
+  } else if (formatDateISO(date) === formatDateISO(tomorrow)) {
+    labelEl.textContent = '明日の予定';
+  } else if (formatDateISO(date) === formatDateISO(yesterday)) {
+    labelEl.textContent = '昨日の予定';
+  } else {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+    const weekday = weekdays[date.getDay()];
+    labelEl.textContent = `${month}月${day}日(${weekday})の予定`;
+  }
+}
+
+// スワイプ検知を初期化
+function initGaugeSwipe() {
+  const container = document.getElementById('time-gauge-container');
+  if (!container) return;
+
+  let startX = 0;
+  let startY = 0;
+  let isDragging = false;
+
+  container.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isDragging = true;
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const diffX = endX - startX;
+    const diffY = endY - startY;
+
+    // 横方向のスワイプ判定（50px以上、かつ縦方向より横方向が大きい）
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        // 右スワイプ: 前日
+        changeGaugeDate(-1);
+      } else {
+        // 左スワイプ: 翌日
+        changeGaugeDate(1);
+      }
+    }
+  }, { passive: true });
+
+  // ナビゲーションボタン
+  const prevBtn = document.getElementById('gauge-prev-btn');
+  const nextBtn = document.getElementById('gauge-next-btn');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => changeGaugeDate(-1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => changeGaugeDate(1));
+  }
+}
+
 // 時間帯のタスク一覧を表示
 function showTimeSlotTasks(startMinutes, endMinutes) {
   const startHour = Math.floor(startMinutes / 60);
