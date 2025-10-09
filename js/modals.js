@@ -10,8 +10,7 @@ function openCreateModal() {
   document.getElementById('task-title').value = '';
   document.getElementById('task-memo').value = '';
   document.getElementById('task-due-date').value = '';
-  document.getElementById('task-start-time').value = '';
-  document.getElementById('task-end-time').value = '';
+  document.getElementById('task-duration').value = '';
   document.getElementById('task-urgent').checked = false;
   document.getElementById('task-priority').value = '';
   document.getElementById('title-char-count').textContent = '0';
@@ -44,9 +43,8 @@ function openEditModal(id) {
   } else {
     document.getElementById('task-due-date').value = '';
   }
-  // 開始時刻・終了時刻・緊急・優先順位を反映
-  document.getElementById('task-start-time').value = task.startTime || '';
-  document.getElementById('task-end-time').value = task.endTime || '';
+  // 所要時間・緊急・優先順位を反映
+  document.getElementById('task-duration').value = task.duration || '';
   document.getElementById('task-urgent').checked = task.urgent || false;
   document.getElementById('task-priority').value = task.priority || '';
 
@@ -189,8 +187,8 @@ function saveTask() {
 
   const memo = document.getElementById('task-memo').value.trim();
   const dueDateInput = document.getElementById('task-due-date').value;
-  const startTime = document.getElementById('task-start-time').value;
-  const endTime = document.getElementById('task-end-time').value;
+  const durationValue = document.getElementById('task-duration').value;
+  const duration = durationValue ? parseInt(durationValue) : null;
   const urgent = document.getElementById('task-urgent').checked;
   const priority = document.getElementById('task-priority').value;
 
@@ -202,7 +200,7 @@ function saveTask() {
 
   if (editingTaskId) {
     // 更新
-    updateTask(editingTaskId, { title, memo, dueDate, startTime, endTime, urgent, priority });
+    updateTask(editingTaskId, { title, memo, dueDate, duration, urgent, priority });
 
     // サブタスク保存
     const tasks = getTasks();
@@ -245,9 +243,9 @@ function saveTask() {
       totalTime: 0,
       isTimerRunning: false,
       timerStartTime: null,
-      duration: null,
-      startTime: startTime,
-      endTime: endTime,
+      duration: duration,
+      startTime: null,
+      endTime: null,
       urgent: urgent,
       priority: priority
     };
@@ -256,7 +254,7 @@ function saveTask() {
 
     // 履歴に追加
     if (typeof addToTaskHistory === 'function') {
-      addToTaskHistory(task.title, task.startTime, task.endTime, 20);
+      addToTaskHistory(task.title, null, null, 20);
       try {
         document.dispatchEvent(new CustomEvent('task:history:updated'));
       } catch (e) {
@@ -314,23 +312,102 @@ function confirmAction(message, callback) {
 
 // 設定モーダルを開く
 function openSettingsModal() {
-  const routines = getRoutines();
-
-  // 各ルーティンの設定を読み込み
-  ['breakfast', 'lunch', 'dinner', 'brush', 'sleep'].forEach(type => {
-    const routine = routines[type];
-    const checkbox = document.getElementById(`routine-${type}-enabled`);
-    const durationSelect = document.getElementById(`routine-${type}-duration`);
-
-    if (routine && routine.enabled) {
-      checkbox.checked = true;
-      durationSelect.value = routine.duration;
-    } else {
-      checkbox.checked = false;
-    }
-  });
-
+  renderRoutinesList();
   document.getElementById('settings-modal').classList.add('show');
+}
+
+// ルーティンリストを描画
+function renderRoutinesList() {
+  const routines = getRoutines();
+  const container = document.getElementById('routines-list');
+  container.innerHTML = '';
+
+  routines.forEach((routine, index) => {
+    const item = document.createElement('div');
+    item.className = 'routine-item';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'routine-name-input';
+    nameInput.value = routine.name || '';
+    nameInput.placeholder = 'ルーティン名を入力';
+    nameInput.maxLength = 50;
+    nameInput.dataset.index = index;
+
+    const durationInput = document.createElement('select');
+    durationInput.className = 'routine-duration-input';
+    durationInput.dataset.index = index;
+
+    // 時間オプション
+    const durationOptions = [
+      { value: 5, text: '5分' },
+      { value: 10, text: '10分' },
+      { value: 15, text: '15分' },
+      { value: 30, text: '30分' },
+      { value: 45, text: '45分' },
+      { value: 60, text: '1時間' },
+      { value: 90, text: '1時間30分' },
+      { value: 120, text: '2時間' },
+      { value: 180, text: '3時間' },
+      { value: 240, text: '4時間' },
+      { value: 360, text: '6時間' },
+      { value: 420, text: '7時間' },
+      { value: 480, text: '8時間' },
+      { value: 540, text: '9時間' }
+    ];
+
+    durationOptions.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.text;
+      if (routine.duration === opt.value) {
+        option.selected = true;
+      }
+      durationInput.appendChild(option);
+    });
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'routine-delete-btn';
+    deleteBtn.textContent = '×';
+    deleteBtn.type = 'button';
+    deleteBtn.addEventListener('click', () => {
+      deleteRoutine(index);
+    });
+
+    item.appendChild(nameInput);
+    item.appendChild(durationInput);
+    item.appendChild(deleteBtn);
+    container.appendChild(item);
+  });
+}
+
+// ルーティンを削除
+function deleteRoutine(index) {
+  const routines = getRoutines();
+  routines.splice(index, 1);
+  saveRoutines(routines);
+  renderRoutinesList();
+}
+
+// ルーティンを追加
+function addRoutine() {
+  const routines = getRoutines();
+  const newRoutine = {
+    id: generateUUID(),
+    name: '',
+    duration: 30
+  };
+  routines.push(newRoutine);
+  saveRoutines(routines);
+  renderRoutinesList();
+
+  // 新規ルーティンの名前入力にフォーカス
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.routine-name-input');
+    if (inputs.length > 0) {
+      inputs[inputs.length - 1].focus();
+    }
+  }, 0);
 }
 
 // 設定モーダルを閉じる
@@ -340,16 +417,20 @@ function closeSettingsModal() {
 
 // 設定を保存
 function saveSettings() {
-  const routines = {};
+  const routines = [];
+  const nameInputs = document.querySelectorAll('.routine-name-input');
+  const durationInputs = document.querySelectorAll('.routine-duration-input');
 
-  ['breakfast', 'lunch', 'dinner', 'brush', 'sleep'].forEach(type => {
-    const enabled = document.getElementById(`routine-${type}-enabled`).checked;
-    const duration = parseInt(document.getElementById(`routine-${type}-duration`).value);
-
-    routines[type] = {
-      enabled: enabled,
-      duration: duration
-    };
+  nameInputs.forEach((nameInput, index) => {
+    const name = nameInput.value.trim();
+    if (name) {
+      const routine = {
+        id: getRoutines()[index]?.id || generateUUID(),
+        name: name,
+        duration: parseInt(durationInputs[index].value)
+      };
+      routines.push(routine);
+    }
   });
 
   saveRoutines(routines);

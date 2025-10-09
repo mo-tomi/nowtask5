@@ -315,7 +315,7 @@ function updateTimerDisplay(taskId) {
 
 // ルーティン設定取得
 function getRoutines() {
-  return loadFromStorage(STORAGE_KEYS.ROUTINES, {});
+  return loadFromStorage(STORAGE_KEYS.ROUTINES, []);
 }
 
 // ルーティン設定保存
@@ -330,15 +330,12 @@ function createDailyRoutineTasks() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const routineTypes = ['breakfast', 'lunch', 'dinner', 'brush', 'sleep'];
-
-  routineTypes.forEach(type => {
-    const routine = routines[type];
-    if (!routine || !routine.enabled) return;
+  routines.forEach((routine, index) => {
+    if (!routine.name || !routine.duration) return;
 
     // 今日のこのルーティンタスクが既に存在するかチェック
     const existsToday = tasks.some(task => {
-      if (!task.isRoutine || task.routineType !== type) return false;
+      if (!task.isRoutine || task.routineId !== routine.id) return false;
       const taskDate = new Date(task.createdAt);
       taskDate.setHours(0, 0, 0, 0);
       return taskDate.getTime() === today.getTime();
@@ -347,17 +344,9 @@ function createDailyRoutineTasks() {
     if (existsToday) return;
 
     // ルーティンタスクを作成
-    const taskNames = {
-      breakfast: '朝食',
-      lunch: '昼食',
-      dinner: '夕食',
-      brush: '歯磨き',
-      sleep: '睡眠'
-    };
-
     const task = {
       id: generateUUID(),
-      title: taskNames[type],
+      title: routine.name,
       memo: '',
       dueDate: null,
       isCompleted: false,
@@ -370,7 +359,7 @@ function createDailyRoutineTasks() {
       timerStartTime: null,
       duration: routine.duration,
       isRoutine: true,
-      routineType: type
+      routineId: routine.id
     };
 
     const allTasks = getTasks();

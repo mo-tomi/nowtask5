@@ -38,6 +38,11 @@ function initEventListeners() {
     saveSettings();
   });
 
+  // ルーティン追加
+  document.getElementById('add-routine-btn').addEventListener('click', () => {
+    addRoutine();
+  });
+
   // 完了済み折りたたみ
   const completedToggle = document.getElementById('completed-toggle');
   const completedContent = document.getElementById('completed-content');
@@ -121,8 +126,7 @@ function initEventListeners() {
   const quickDateBtn = document.getElementById('quick-date-btn');
   const quickDatetimePanel = document.getElementById('quick-datetime-panel');
   const quickDateInput = document.getElementById('quick-add-date');
-  const quickStartTime = document.getElementById('quick-add-start-time');
-  const quickEndTime = document.getElementById('quick-add-end-time');
+  const quickDuration = document.getElementById('quick-add-duration');
   const quickDatetimeClose = document.getElementById('quick-datetime-close');
   const quickHistoryBtn = document.getElementById('quick-history-btn');
   const quickHistoryTags = document.getElementById('quick-history-tags');
@@ -166,8 +170,8 @@ function initEventListeners() {
     e.preventDefault();
     if (quickInput.value.trim()) {
       const title = quickInput.value.trim();
-      const startTime = quickStartTime.value || null;
-      const endTime = quickEndTime.value || null;
+      const durationValue = quickDuration ? quickDuration.value : '';
+      const duration = durationValue ? parseInt(durationValue) : null;
 
       // 期限日のみ（時刻なし）
       let dueDate = null;
@@ -191,9 +195,9 @@ function initEventListeners() {
         totalTime: 0,
         isTimerRunning: false,
         timerStartTime: null,
-        duration: null,
-        startTime: startTime,
-        endTime: endTime,
+        duration: duration,
+        startTime: null,
+        endTime: null,
         urgent: false,
         priority: ''
       };
@@ -202,7 +206,7 @@ function initEventListeners() {
 
       // 履歴に追加
       if (typeof addToTaskHistory === 'function') {
-        addToTaskHistory(task.title, task.startTime, task.endTime, 20);
+        addToTaskHistory(task.title, null, null, 20);
         try {
           document.dispatchEvent(new CustomEvent('task:history:updated'));
         } catch (e) {
@@ -212,8 +216,7 @@ function initEventListeners() {
 
       quickInput.value = '';
       quickDateInput.value = '';
-      quickStartTime.value = '';
-      quickEndTime.value = '';
+      if (quickDuration) quickDuration.value = '';
       quickDatetimePanel.style.display = 'none';
       quickDateBtn.classList.remove('has-date');
       renderTasks();

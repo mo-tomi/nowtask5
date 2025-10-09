@@ -74,12 +74,24 @@
           <input type="date" id="quick-add-date" class="quick-date-input-inline">
         </div>
         <div class="quick-datetime-row">
-          <label>開始:</label>
-          <input type="time" id="quick-add-start-time" class="quick-time-input-inline">
-        </div>
-        <div class="quick-datetime-row">
-          <label>終了:</label>
-          <input type="time" id="quick-add-end-time" class="quick-time-input-inline">
+          <label>所要時間:</label>
+          <select id="quick-add-duration" class="quick-duration-input-inline">
+            <option value="">未設定</option>
+            <option value="30">30分</option>
+            <option value="60">1時間</option>
+            <option value="90">1時間30分</option>
+            <option value="120">2時間</option>
+            <option value="150">2時間30分</option>
+            <option value="180">3時間</option>
+            <option value="210">3時間30分</option>
+            <option value="240">4時間</option>
+            <option value="270">4時間30分</option>
+            <option value="300">5時間</option>
+            <option value="330">5時間30分</option>
+            <option value="360">6時間</option>
+            <option value="420">7時間</option>
+            <option value="480">8時間</option>
+          </select>
         </div>
         <button type="button" id="quick-datetime-close" class="quick-datetime-close">×</button>
       </div>
@@ -217,12 +229,24 @@
           <input type="date" id="task-due-date">
         </div>
         <div class="form-group">
-          <label for="task-start-time">開始時刻</label>
-          <input type="time" id="task-start-time">
-        </div>
-        <div class="form-group">
-          <label for="task-end-time">終了時刻</label>
-          <input type="time" id="task-end-time">
+          <label for="task-duration">所要時間</label>
+          <select id="task-duration">
+            <option value="">時間未設定</option>
+            <option value="30">30分</option>
+            <option value="60">1時間</option>
+            <option value="90">1時間30分</option>
+            <option value="120">2時間</option>
+            <option value="150">2時間30分</option>
+            <option value="180">3時間</option>
+            <option value="210">3時間30分</option>
+            <option value="240">4時間</option>
+            <option value="270">4時間30分</option>
+            <option value="300">5時間</option>
+            <option value="330">5時間30分</option>
+            <option value="360">6時間</option>
+            <option value="420">7時間</option>
+            <option value="480">8時間</option>
+          </select>
         </div>
         <div class="form-group">
           <label>
@@ -285,81 +309,13 @@
       </div>
       <div class="modal-body">
         <h3 class="settings-section-title">デイリールーティン</h3>
-        <p class="settings-description">毎日繰り返すタスクを設定できます。有効にすると、毎日自動的にタスクが作成されます。</p>
+        <p class="settings-description">毎日繰り返すタスクを設定できます。ルーティン名と時間を自由に設定できます。</p>
 
-        <div class="routine-item">
-          <div class="routine-header">
-            <label class="routine-toggle">
-              <input type="checkbox" id="routine-breakfast-enabled">
-              <span class="routine-name">朝食</span>
-            </label>
-            <select id="routine-breakfast-duration" class="routine-duration-inline">
-              <option value="15">15分</option>
-              <option value="30" selected>30分</option>
-              <option value="45">45分</option>
-              <option value="60">1時間</option>
-            </select>
-          </div>
+        <div id="routines-list" class="routines-list">
+          <!-- ルーティンアイテムが動的に追加される -->
         </div>
 
-        <div class="routine-item">
-          <div class="routine-header">
-            <label class="routine-toggle">
-              <input type="checkbox" id="routine-lunch-enabled">
-              <span class="routine-name">昼食</span>
-            </label>
-            <select id="routine-lunch-duration" class="routine-duration-inline">
-              <option value="15">15分</option>
-              <option value="30">30分</option>
-              <option value="45" selected>45分</option>
-              <option value="60">1時間</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="routine-item">
-          <div class="routine-header">
-            <label class="routine-toggle">
-              <input type="checkbox" id="routine-dinner-enabled">
-              <span class="routine-name">夕食</span>
-            </label>
-            <select id="routine-dinner-duration" class="routine-duration-inline">
-              <option value="30">30分</option>
-              <option value="45">45分</option>
-              <option value="60" selected>1時間</option>
-              <option value="90">1時間30分</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="routine-item">
-          <div class="routine-header">
-            <label class="routine-toggle">
-              <input type="checkbox" id="routine-brush-enabled">
-              <span class="routine-name">歯磨き</span>
-            </label>
-            <select id="routine-brush-duration" class="routine-duration-inline">
-              <option value="5">5分</option>
-              <option value="10" selected>10分</option>
-              <option value="15">15分</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="routine-item">
-          <div class="routine-header">
-            <label class="routine-toggle">
-              <input type="checkbox" id="routine-sleep-enabled">
-              <span class="routine-name">睡眠</span>
-            </label>
-            <select id="routine-sleep-duration" class="routine-duration-inline">
-              <option value="360">6時間</option>
-              <option value="420">7時間</option>
-              <option value="480" selected>8時間</option>
-              <option value="540">9時間</option>
-            </select>
-          </div>
-        </div>
+        <button type="button" class="btn-add-routine" id="add-routine-btn">+ ルーティンを追加</button>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" id="save-settings-btn">保存</button>

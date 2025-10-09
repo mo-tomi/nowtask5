@@ -186,7 +186,7 @@ body {
 }
 
 .quick-date-input-inline,
-.quick-time-input-inline {
+.quick-duration-input-inline {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #e0e0e0;
@@ -199,7 +199,7 @@ body {
 }
 
 .quick-date-input-inline:focus,
-.quick-time-input-inline:focus {
+.quick-duration-input-inline:focus {
   border-color: #000000;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
@@ -1123,48 +1123,97 @@ body {
   line-height: 1.5;
 }
 
+.routines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .routine-item {
   background: #f5f5f5;
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 12px;
-}
-
-.routine-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.routine-toggle {
   display: flex;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
+}
+
+.routine-name-input {
   flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  outline: none;
 }
 
-.routine-toggle input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
+.routine-name-input:focus {
+  border-color: #000000;
 }
 
-.routine-name {
-  color: #333;
-}
-
-.routine-duration-inline {
-  padding: 6px 12px;
+.routine-duration-input {
+  padding: 8px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-size: 14px;
   background-color: white;
   cursor: pointer;
-  min-width: 100px;
+  min-width: 120px;
+  outline: none;
+}
+
+.routine-duration-input:focus {
+  border-color: #000000;
+}
+
+.routine-delete-btn {
+  background: rgba(244, 67, 54, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #f44336;
+  font-size: 20px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.routine-delete-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: scale(1.1);
+}
+
+.routine-delete-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-add-routine {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+}
+
+.btn-add-routine:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.btn-add-routine:active {
+  transform: scale(0.98);
 }
 
 /* ========================================
