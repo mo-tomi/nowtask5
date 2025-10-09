@@ -129,13 +129,22 @@
         </div>
       </div>
 
-      <!-- 並び替えセレクト -->
-      <div class="sort-container" style="display:flex; align-items:center; gap:8px; margin: 12px 0;">
-        <label for="sort-select" style="font-size:14px; color:#616161;">並び替え:</label>
-        <select id="sort-select">
-          <option value="time">時間順（期限が近い順）</option>
-          <option value="created">追加順（新しい順）</option>
-        </select>
+      <!-- 絞り込みと並び替えコントロール -->
+      <div class="filter-sort-container" style="display:flex; align-items:center; gap:12px; margin: 12px 0; flex-wrap: wrap;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label style="font-size:14px; color:#616161;">絞り込み:</label>
+          <button id="filter-urgent" class="filter-btn" type="button">緊急</button>
+          <button id="filter-high-priority" class="filter-btn" type="button">優先度:高</button>
+          <button id="filter-clear" class="filter-btn-clear" type="button">クリア</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label for="sort-select" style="font-size:14px; color:#616161;">並び替え:</label>
+          <select id="sort-select">
+            <option value="time">時間順（期限が近い順）</option>
+            <option value="created">追加順（新しい順）</option>
+            <option value="priority">優先順位順</option>
+          </select>
+        </div>
       </div>
 
       <div id="tasks-list" class="task-list"></div>
@@ -204,8 +213,8 @@
           <textarea id="task-memo" rows="4" placeholder="メモを入力（任意）"></textarea>
         </div>
         <div class="form-group">
-          <label for="task-due-date">期限日時</label>
-          <input type="datetime-local" id="task-due-date">
+          <label for="task-due-date">期限日</label>
+          <input type="date" id="task-due-date">
         </div>
         <div class="form-group">
           <label for="task-start-time">開始時刻</label>

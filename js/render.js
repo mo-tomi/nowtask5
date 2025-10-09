@@ -88,6 +88,9 @@ function formatDateISO(dateObj) {
   return `${y}-${m}-${d}`;
 }
 
+// グローバルフィルター状態
+let currentFilter = null; // 'urgent' | 'high-priority' | null
+
 // タスクリスト表示
 function renderTasks() {
   const tasks = getTasks();
@@ -106,6 +109,14 @@ function renderTasks() {
   }
 
   let activeTasks = tasks.filter(t => !t.isCompleted && !t.parentId);
+
+  // 絞り込み適用
+  if (currentFilter === 'urgent') {
+    activeTasks = activeTasks.filter(t => t.urgent);
+  } else if (currentFilter === 'high-priority') {
+    activeTasks = activeTasks.filter(t => t.priority === 'high');
+  }
+
   // 並び替え設定（レンダリング時に各日付グループ内で適用する）
   const sortPref = (sortSelectEl && sortSelectEl.value) || savedSort || 'time';
   const completedTasks = tasks.filter(t => t.isCompleted && !t.parentId);
@@ -137,6 +148,18 @@ function renderTasks() {
       } else if (sortPref === 'created') {
         // 追加順: createdAt の降順（新しいものを上に）
         dateTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } else if (sortPref === 'priority') {
+        // 優先順位順: 緊急 > 高 > 中 > 低 > 未設定
+        const priorityOrder = { high: 1, medium: 2, low: 3, '': 4 };
+        dateTasks.sort((a, b) => {
+          // 緊急フラグを最優先
+          if (a.urgent && !b.urgent) return -1;
+          if (!a.urgent && b.urgent) return 1;
+          // 優先度で比較
+          const aPriority = priorityOrder[a.priority || ''] || 4;
+          const bPriority = priorityOrder[b.priority || ''] || 4;
+          return aPriority - bPriority;
+        });
       }
       // 日付セパレーター
       const dateSeparator = document.createElement('div');

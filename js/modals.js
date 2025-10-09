@@ -37,9 +37,9 @@ function openEditModal(id) {
   document.getElementById('title-char-count').textContent = task.title.length;
 
   if (task.dueDate) {
-    // ISO形式をdatetime-local形式に変換
+    // ISO形式をdate形式に変換
     const date = new Date(task.dueDate);
-    const localISO = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    const localISO = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     document.getElementById('task-due-date').value = localISO;
   } else {
     document.getElementById('task-due-date').value = '';
@@ -194,12 +194,10 @@ function saveTask() {
   const urgent = document.getElementById('task-urgent').checked;
   const priority = document.getElementById('task-priority').value;
 
-  // デフォルト18:00を設定
+  // 期限日のみ（時刻なし）
   let dueDate = null;
   if (dueDateInput) {
-    // 時刻が含まれていない場合は18:00を追加
-    const dateTimeStr = dueDateInput.includes('T') ? dueDateInput : `${dueDateInput}T18:00`;
-    dueDate = new Date(dateTimeStr).toISOString();
+    dueDate = new Date(dueDateInput + 'T00:00:00').toISOString();
   }
 
   if (editingTaskId) {

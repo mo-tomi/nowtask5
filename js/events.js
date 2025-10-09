@@ -169,13 +169,10 @@ function initEventListeners() {
       const startTime = quickStartTime.value || null;
       const endTime = quickEndTime.value || null;
 
-      // デフォルト18:00を設定
+      // 期限日のみ（時刻なし）
       let dueDate = null;
       if (quickDateInput.value) {
-        const dateValue = quickDateInput.value;
-        // 時刻が含まれていない場合は18:00を追加
-        const dateTimeStr = dateValue.includes('T') ? dateValue : `${dateValue}T18:00`;
-        dueDate = new Date(dateTimeStr).toISOString();
+        dueDate = new Date(quickDateInput.value + 'T00:00:00').toISOString();
       }
 
       // 新規タスク作成
@@ -304,7 +301,39 @@ function initEventListeners() {
   document.addEventListener('task:history:updated', () => {
     renderHistoryTags();
   });
-  
+
+  // 絞り込みボタン
+  const filterUrgentBtn = document.getElementById('filter-urgent');
+  const filterHighPriorityBtn = document.getElementById('filter-high-priority');
+  const filterClearBtn = document.getElementById('filter-clear');
+
+  if (filterUrgentBtn) {
+    filterUrgentBtn.addEventListener('click', () => {
+      currentFilter = currentFilter === 'urgent' ? null : 'urgent';
+      filterUrgentBtn.classList.toggle('active');
+      filterHighPriorityBtn.classList.remove('active');
+      renderTasks();
+    });
+  }
+
+  if (filterHighPriorityBtn) {
+    filterHighPriorityBtn.addEventListener('click', () => {
+      currentFilter = currentFilter === 'high-priority' ? null : 'high-priority';
+      filterHighPriorityBtn.classList.toggle('active');
+      filterUrgentBtn.classList.remove('active');
+      renderTasks();
+    });
+  }
+
+  if (filterClearBtn) {
+    filterClearBtn.addEventListener('click', () => {
+      currentFilter = null;
+      filterUrgentBtn.classList.remove('active');
+      filterHighPriorityBtn.classList.remove('active');
+      renderTasks();
+    });
+  }
+
   // サブタスク追加ボタン
   document.getElementById('add-subtask-btn').addEventListener('click', () => {
     addSubtask();
