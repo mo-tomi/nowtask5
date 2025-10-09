@@ -370,9 +370,9 @@ body {
 
 .remaining-tasks {
   font-size: 14px;
-  color: #333333;
+  color: #2196F3;
   font-weight: 600;
-  background: rgba(255, 152, 0, 0.1);
+  background: rgba(33, 150, 243, 0.1);
   padding: 4px 12px;
   border-radius: 12px;
 }
