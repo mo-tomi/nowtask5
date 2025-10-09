@@ -326,12 +326,19 @@ function saveRoutines(routines) {
 // 今日のルーティンタスクを作成
 function createDailyRoutineTasks() {
   const routines = getRoutines();
+
+  // 配列でない場合（旧形式）はスキップ
+  if (!Array.isArray(routines)) {
+    console.warn('Routines is not an array, skipping routine task creation');
+    return;
+  }
+
   const tasks = getTasks();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   routines.forEach((routine, index) => {
-    if (!routine.name || !routine.duration) return;
+    if (!routine || !routine.name || !routine.duration) return;
 
     // 今日のこのルーティンタスクが既に存在するかチェック
     const existsToday = tasks.some(task => {
