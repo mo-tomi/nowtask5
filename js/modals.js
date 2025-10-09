@@ -11,6 +11,8 @@ function openCreateModal() {
   document.getElementById('task-memo').value = '';
   document.getElementById('task-due-date').value = '';
   document.getElementById('task-duration').value = '';
+  document.getElementById('task-start-time').value = '';
+  document.getElementById('task-end-time').value = '';
   document.getElementById('task-urgent').checked = false;
   document.getElementById('task-priority').value = '';
   document.getElementById('title-char-count').textContent = '0';
@@ -43,8 +45,10 @@ function openEditModal(id) {
   } else {
     document.getElementById('task-due-date').value = '';
   }
-  // 所要時間・緊急・優先順位を反映
+  // 所要時間・開始時刻・終了時刻・緊急・優先順位を反映
   document.getElementById('task-duration').value = task.duration || '';
+  document.getElementById('task-start-time').value = task.startTime || '';
+  document.getElementById('task-end-time').value = task.endTime || '';
   document.getElementById('task-urgent').checked = task.urgent || false;
   document.getElementById('task-priority').value = task.priority || '';
 
@@ -189,6 +193,8 @@ function saveTask() {
   const dueDateInput = document.getElementById('task-due-date').value;
   const durationValue = document.getElementById('task-duration').value;
   const duration = durationValue ? parseInt(durationValue) : null;
+  const startTime = document.getElementById('task-start-time').value || null;
+  const endTime = document.getElementById('task-end-time').value || null;
   const urgent = document.getElementById('task-urgent').checked;
   const priority = document.getElementById('task-priority').value;
 
@@ -200,7 +206,7 @@ function saveTask() {
 
   if (editingTaskId) {
     // 更新
-    updateTask(editingTaskId, { title, memo, dueDate, duration, urgent, priority });
+    updateTask(editingTaskId, { title, memo, dueDate, duration, startTime, endTime, urgent, priority });
 
     // サブタスク保存
     const tasks = getTasks();
@@ -244,8 +250,8 @@ function saveTask() {
       isTimerRunning: false,
       timerStartTime: null,
       duration: duration,
-      startTime: null,
-      endTime: null,
+      startTime: startTime,
+      endTime: endTime,
       urgent: urgent,
       priority: priority
     };
@@ -325,9 +331,14 @@ function openSettingsModal() {
 
 // ルーティンリストを描画
 function renderRoutinesList() {
-  const routines = getRoutines();
-  const container = document.getElementById('routines-list');
-  container.innerHTML = '';
+  try {
+    const routines = getRoutines();
+    const container = document.getElementById('routines-list');
+    if (!container) {
+      console.error('routines-list container not found');
+      return;
+    }
+    container.innerHTML = '';
 
   routines.forEach((routine, index) => {
     const item = document.createElement('div');
@@ -386,6 +397,10 @@ function renderRoutinesList() {
     item.appendChild(deleteBtn);
     container.appendChild(item);
   });
+  } catch (e) {
+    console.error('Error in renderRoutinesList:', e);
+    alert('ルーティンリストの表示エラー: ' + e.message);
+  }
 }
 
 // ルーティンを削除
