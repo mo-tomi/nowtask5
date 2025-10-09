@@ -1648,3 +1648,65 @@ body {
 .timer-stop-btn:active {
   transform: scale(0.95);
 }
+
+/* ========================================
+   タスク時間ブロック（ゲージ）
+   ======================================== */
+.task-time-block {
+  position: absolute;
+  height: 100%;
+  background: rgba(76, 175, 80, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.task-time-block:hover {
+  background: rgba(76, 175, 80, 1);
+  transform: scaleY(1.1);
+  z-index: 10;
+}
+
+.task-time-block:active {
+  transform: scaleY(0.95);
+}
+
+/* ========================================
+   時間帯タスク一覧モーダル
+   ======================================== */
+.time-slot-modal {
+  max-width: 500px;
+}
+
+.time-slot-task-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-slot-task-item:hover {
+  background: #e0e0e0;
+  transform: translateX(4px);
+}
+
+.time-slot-task-item .task-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.time-slot-task-item .task-time {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.time-slot-task-item .task-memo {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
+  white-space: pre-wrap;
+}

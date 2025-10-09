@@ -2,6 +2,88 @@
 // 24時間ゲージ
 // ========================================
 
+// 時間帯のタスク一覧を表示
+function showTimeSlotTasks(startMinutes, endMinutes) {
+  const startHour = Math.floor(startMinutes / 60);
+  const startMin = startMinutes % 60;
+  const endHour = Math.floor(endMinutes / 60);
+  const endMin = endMinutes % 60;
+
+  const timeRange = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')} ~ ${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+
+  // 該当時間帯のタスクを取得
+  const tasks = getTasks();
+  const matchingTasks = tasks.filter(task => {
+    if (task.isCompleted || !task.startTime || !task.endTime) return false;
+
+    const [taskStartHour, taskStartMin] = task.startTime.split(':').map(Number);
+    const [taskEndHour, taskEndMin] = task.endTime.split(':').map(Number);
+    const taskStartMinutes = taskStartHour * 60 + taskStartMin;
+    const taskEndMinutes = taskEndHour * 60 + taskEndMin;
+
+    // 時間帯が重なっているかチェック
+    return (taskStartMinutes < endMinutes && taskEndMinutes > startMinutes);
+  });
+
+  if (matchingTasks.length === 0) {
+    alert(`${timeRange}\nこの時間帯にタスクはありません`);
+    return;
+  }
+
+  // モーダルを表示
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.style.display = 'flex';
+
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content time-slot-modal';
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
+  header.innerHTML = `
+    <h2>${timeRange} のタスク</h2>
+    <button class="close-btn">&times;</button>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+
+  matchingTasks.forEach(task => {
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'time-slot-task-item';
+    taskDiv.innerHTML = `
+      <div class="task-title">${task.title}</div>
+      <div class="task-time">🕒 ${task.startTime} ~ ${task.endTime}</div>
+      ${task.memo ? `<div class="task-memo">${task.memo}</div>` : ''}
+    `;
+    taskDiv.addEventListener('click', () => {
+      modal.remove();
+      openEditModal(task.id);
+    });
+    body.appendChild(taskDiv);
+  });
+
+  const footer = document.createElement('div');
+  footer.className = 'modal-footer';
+  footer.innerHTML = `<button class="btn btn-secondary">閉じる</button>`;
+
+  modalContent.appendChild(header);
+  modalContent.appendChild(body);
+  modalContent.appendChild(footer);
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  // 閉じるイベント
+  const closeBtn = header.querySelector('.close-btn');
+  const closeFooterBtn = footer.querySelector('.btn');
+
+  closeBtn.addEventListener('click', () => modal.remove());
+  closeFooterBtn.addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
 // 24時間ゲージ更新
 // dateArg: Date オブジェクトか ISO 日付文字列（YYYY-MM-DD）を受け取る。未指定なら現在日時を使用。
 function updateTimeGauge(dateArg) {
@@ -147,19 +229,81 @@ function updateScheduledTasks(dateArg) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // 予定ゲージ更新
+  // 予定ゲージ更新（時間帯ごとに個別のブロックを作成）
   const scheduledBar = document.getElementById('time-gauge-scheduled');
-  if (totalDurationMinutes === 0) {
-    scheduledBar.style.display = 'none';
-  } else {
-    // ゲージの開始位置と幅を計算
-    const startPercent = (currentMinutes / (24 * 60)) * 100;
-    const durationPercent = (totalDurationMinutes / (24 * 60)) * 100;
+  scheduledBar.innerHTML = ''; // 既存のブロックをクリア
+  scheduledBar.style.display = 'block';
+  scheduledBar.style.left = '0';
+  scheduledBar.style.width = '100%';
 
-    scheduledBar.style.display = 'block';
-    scheduledBar.style.left = `${startPercent}%`;
-    scheduledBar.style.width = `${Math.min(durationPercent, 100 - startPercent)}%`;
-  }
+  // 各タスクを時間帯ごとにブロックとして表示
+  const taskBlocks = [];
+
+  todayTasks.forEach(task => {
+    if (task.startTime && task.endTime) {
+      const [startHour, startMin] = task.startTime.split(':').map(Number);
+      const [endHour, endMin] = task.endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      if (endMinutes < startMinutes) {
+        // 日をまたぐ場合: 当日分のみ表示
+        taskBlocks.push({
+          startMinutes: startMinutes,
+          endMinutes: 24 * 60,
+          task: task
+        });
+      } else {
+        taskBlocks.push({
+          startMinutes: startMinutes,
+          endMinutes: endMinutes,
+          task: task
+        });
+      }
+    }
+  });
+
+  // 前日から継続するタスク
+  yesterdayTasks.forEach(task => {
+    if (task.startTime && task.endTime) {
+      const [startHour, startMin] = task.startTime.split(':').map(Number);
+      const [endHour, endMin] = task.endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      if (endMinutes < startMinutes) {
+        taskBlocks.push({
+          startMinutes: 0,
+          endMinutes: endMinutes,
+          task: task
+        });
+      }
+    }
+  });
+
+  // ブロックを開始時刻順にソート
+  taskBlocks.sort((a, b) => a.startMinutes - b.startMinutes);
+
+  // 各ブロックを表示
+  taskBlocks.forEach(block => {
+    const blockEl = document.createElement('div');
+    blockEl.className = 'task-time-block';
+    const leftPercent = (block.startMinutes / (24 * 60)) * 100;
+    const widthPercent = ((block.endMinutes - block.startMinutes) / (24 * 60)) * 100;
+    blockEl.style.left = `${leftPercent}%`;
+    blockEl.style.width = `${widthPercent}%`;
+    blockEl.dataset.taskId = block.task.id;
+    blockEl.dataset.startTime = block.task.startTime;
+    blockEl.dataset.endTime = block.task.endTime;
+
+    // クリックイベント
+    blockEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showTimeSlotTasks(block.startMinutes, block.endMinutes);
+    });
+
+    scheduledBar.appendChild(blockEl);
+  });
 
   // 自由時間を計算: 24時間 - 経過時間 - 予定タスク時間
   const totalMinutesInDay = 24 * 60;
