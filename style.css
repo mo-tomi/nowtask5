@@ -77,19 +77,28 @@ body {
 
 .quick-add {
   width: 100%;
-  display: flex;
-  gap: 8px;
   position: relative;
+}
+
+.quick-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 4px;
+  padding-right: 4px;
 }
 
 .quick-add #quick-add-input {
   flex: 1;
   padding: 10px 12px;
+  padding-right: 110px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
   transition: box-shadow 0.2s ease;
+  width: 100%;
 }
 
 .quick-add #quick-add-input:focus {
@@ -100,36 +109,20 @@ body {
   color: #999;
 }
 
-.quick-add-controls {
+.quick-input-actions {
+  position: absolute;
+  right: 4px;
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: center;
 }
 
-/* クイック入力の履歴ドロップダウン */
-.quick-add-history {
-  padding: 8px 10px;
+.quick-icon-btn {
+  background: rgba(0, 0, 0, 0.05);
   border: none;
   border-radius: 4px;
-  font-size: 14px;
-  background-color: white;
-  color: #333;
-  cursor: pointer;
-  outline: none;
-  transition: box-shadow 0.2s ease;
-  min-width: 140px;
-}
-
-.quick-add-history:focus {
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
-}
-
-.quick-date-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 4px;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,24 +132,33 @@ body {
   padding: 0;
 }
 
-.quick-date-btn:hover {
-  background: white;
+.quick-icon-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
   transform: scale(1.05);
 }
 
-.quick-date-btn:active {
+.quick-icon-btn:active {
   transform: scale(0.95);
 }
 
-.quick-date-btn.has-date {
+.quick-icon-btn.has-date {
   background: #000000;
   color: white;
+}
+
+.quick-submit-btn {
+  background: #000000;
+  color: white;
+}
+
+.quick-submit-btn:hover {
+  background: #333333;
 }
 
 .quick-date-input {
   position: absolute;
   top: 100%;
-  right: 140px;
+  right: 0;
   margin-top: 8px;
   padding: 8px;
   border: 2px solid white;
@@ -174,21 +176,24 @@ body {
   cursor: pointer;
 }
 
-.duration-select {
-  padding: 8px 10px;
-  border: none;
+.quick-add-history-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  padding: 8px;
+  border: 2px solid white;
   border-radius: 4px;
   font-size: 14px;
   background-color: white;
   color: #333;
   cursor: pointer;
   outline: none;
-  transition: box-shadow 0.2s ease;
-  min-width: 120px;
-}
-
-.duration-select:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 /* タブナビゲーションのスタイルは廃止済み */
@@ -561,6 +566,43 @@ body {
   padding: 4px 8px;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 6px;
+}
+
+.task-urgent-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #ff0000;
+  color: white;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.task-priority-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.task-priority-label.high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.task-priority-label.medium {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.task-priority-label.low {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .task-actions {

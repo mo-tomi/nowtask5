@@ -118,14 +118,29 @@ function initEventListeners() {
   // クイック入力
   const quickInput = document.getElementById('quick-add-input');
   const quickAddForm = document.getElementById('quick-add-form');
-  const quickDuration = document.getElementById('quick-add-duration');
   const quickDateBtn = document.getElementById('quick-date-btn');
   const quickDateInput = document.getElementById('quick-add-date');
+  const quickHistoryBtn = document.getElementById('quick-history-btn');
   const quickHistorySelect = document.getElementById('quick-add-history');
+
+  // 履歴ボタンのクリック
+  if (quickHistoryBtn) {
+    quickHistoryBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (quickHistorySelect.style.display === 'none') {
+        quickHistorySelect.style.display = 'block';
+        quickHistorySelect.focus();
+      } else {
+        quickHistorySelect.style.display = 'none';
+      }
+    });
+  }
 
   // カレンダーボタンのクリック
   quickDateBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    e.preventDefault();
     if (quickDateInput.style.display === 'none') {
       quickDateInput.style.display = 'block';
       quickDateInput.showPicker();
@@ -148,13 +163,19 @@ function initEventListeners() {
     if (!quickDateInput.contains(e.target) && !quickDateBtn.contains(e.target)) {
       quickDateInput.style.display = 'none';
     }
+    if (quickHistorySelect && !quickHistorySelect.contains(e.target) &&
+        quickHistoryBtn && !quickHistoryBtn.contains(e.target)) {
+      quickHistorySelect.style.display = 'none';
+    }
   });
+
+  // 履歴選択時に使う時間情報を保持
+  let selectedHistoryTime = { startTime: null, endTime: null };
 
   quickAddForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (quickInput.value.trim()) {
       const title = quickInput.value.trim();
-      const duration = quickDuration.value ? parseInt(quickDuration.value) : null;
 
       // デフォルト18:00を設定
       let dueDate = null;
@@ -165,11 +186,45 @@ function initEventListeners() {
         dueDate = new Date(dateTimeStr).toISOString();
       }
 
-      createTask(title, '', dueDate, null, false, duration);
+      // 新規タスク作成（履歴から取得した時間情報を使用）
+      const tasks = getTasks();
+      const now = new Date().toISOString();
+      const task = {
+        id: generateUUID(),
+        title: title,
+        memo: '',
+        dueDate: dueDate,
+        isCompleted: false,
+        createdAt: now,
+        updatedAt: now,
+        parentId: null,
+        isTutorial: false,
+        totalTime: 0,
+        isTimerRunning: false,
+        timerStartTime: null,
+        duration: null,
+        startTime: selectedHistoryTime.startTime,
+        endTime: selectedHistoryTime.endTime,
+        urgent: false,
+        priority: ''
+      };
+      tasks.unshift(task);
+      saveTasks(tasks);
+
+      // 履歴に追加
+      if (typeof addToTaskHistory === 'function') {
+        addToTaskHistory(task.title, task.startTime, task.endTime, 20);
+        try {
+          document.dispatchEvent(new CustomEvent('task:history:updated'));
+        } catch (e) {
+          console.warn('CustomEvent dispatch failed', e);
+        }
+      }
+
       quickInput.value = '';
+      selectedHistoryTime = { startTime: null, endTime: null };
       // 履歴セレクトを先頭表示に戻す
       if (quickHistorySelect) quickHistorySelect.selectedIndex = 0;
-      quickDuration.value = '';
       quickDateInput.value = '';
       quickDateInput.style.display = 'none';
       quickDateBtn.classList.remove('has-date');
@@ -180,23 +235,22 @@ function initEventListeners() {
   // ---- 履歴セレクトの初期化とイベント ----
   function renderQuickHistory() {
     if (!quickHistorySelect) return;
-    // 全オプションをクリアし、プレースホルダーは再利用せず毎回新規作成する
-    // 既存の実装では既に削除された要素を再追加しようとしてプレースホルダが表示されない問題がありました。
     quickHistorySelect.innerHTML = '';
 
-    // プレースホルダーを新規作成して追加（常に先頭に表示される）
+    // プレースホルダーを新規作成して追加
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = '履歴';
-    // 選択時に入力欄に何も入れないための空値
+    placeholder.textContent = '履歴から選択';
     quickHistorySelect.appendChild(placeholder);
 
     // getTaskHistory は core.js にて実装
     const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
-    history.forEach(item => {
+    history.forEach((item, index) => {
       const opt = document.createElement('option');
-      opt.value = item;
-      opt.textContent = item;
+      // 履歴データは { title, startTime, endTime } または 文字列の可能性がある
+      const itemTitle = typeof item === 'string' ? item : (item.title || '');
+      opt.value = index; // インデックスを値として保存
+      opt.textContent = itemTitle;
       quickHistorySelect.appendChild(opt);
     });
   }
@@ -205,19 +259,31 @@ function initEventListeners() {
     // 初期描画
     renderQuickHistory();
 
-    // 履歴選択時に入力欄へ自動入力（選択をクリアしない）
+    // 履歴選択時に入力欄へ自動入力＆時間情報を保持
     quickHistorySelect.addEventListener('change', (e) => {
-      const val = e.target.value || '';
-      if (val) {
-        quickInput.value = val;
-        // フォーカスを入力欄に移す
-        quickInput.focus();
+      const index = parseInt(e.target.value);
+      if (!isNaN(index)) {
+        const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
+        const item = history[index];
+        if (item) {
+          const itemTitle = typeof item === 'string' ? item : (item.title || '');
+          const itemStartTime = typeof item === 'object' ? item.startTime : null;
+          const itemEndTime = typeof item === 'object' ? item.endTime : null;
+
+          quickInput.value = itemTitle;
+          selectedHistoryTime = {
+            startTime: itemStartTime,
+            endTime: itemEndTime
+          };
+
+          // フォーカスを入力欄に移す
+          quickInput.focus();
+          quickHistorySelect.style.display = 'none';
+        }
       }
     });
 
-    // 履歴はタスク作成時に更新されるため、ページ内で履歴が変わったら再描画する必要がある。
-    // 単純実装として、タスク追加処理（createTask）が呼ばれた後に renderTasks が実行されるので
-    // renderTasks の中で再描画する実装がない場合は、ここでカスタムイベントを利用して再描画を行う。
+    // 履歴はタスク作成時に更新されるため、カスタムイベントで再描画
     document.addEventListener('task:history:updated', () => {
       renderQuickHistory();
     });

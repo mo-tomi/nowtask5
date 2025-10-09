@@ -10,9 +10,10 @@ function openCreateModal() {
   document.getElementById('task-title').value = '';
   document.getElementById('task-memo').value = '';
   document.getElementById('task-due-date').value = '';
-  // 所要時間初期化
-  const durationEl = document.getElementById('task-duration');
-  if (durationEl) durationEl.value = '';
+  document.getElementById('task-start-time').value = '';
+  document.getElementById('task-end-time').value = '';
+  document.getElementById('task-urgent').checked = false;
+  document.getElementById('task-priority').value = '';
   document.getElementById('title-char-count').textContent = '0';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('timer-section').style.display = 'none';
@@ -43,9 +44,11 @@ function openEditModal(id) {
   } else {
     document.getElementById('task-due-date').value = '';
   }
-  // 所要時間を反映
-  const durationEl = document.getElementById('task-duration');
-  if (durationEl) durationEl.value = task.duration || '';
+  // 開始時刻・終了時刻・緊急・優先順位を反映
+  document.getElementById('task-start-time').value = task.startTime || '';
+  document.getElementById('task-end-time').value = task.endTime || '';
+  document.getElementById('task-urgent').checked = task.urgent || false;
+  document.getElementById('task-priority').value = task.priority || '';
 
   document.getElementById('delete-btn').style.display = 'inline-block';
   document.getElementById('timer-section').style.display = 'block';
@@ -186,8 +189,10 @@ function saveTask() {
 
   const memo = document.getElementById('task-memo').value.trim();
   const dueDateInput = document.getElementById('task-due-date').value;
-  const durationValue = document.getElementById('task-duration') ? document.getElementById('task-duration').value : '';
-  const duration = durationValue ? parseInt(durationValue) : null;
+  const startTime = document.getElementById('task-start-time').value;
+  const endTime = document.getElementById('task-end-time').value;
+  const urgent = document.getElementById('task-urgent').checked;
+  const priority = document.getElementById('task-priority').value;
 
   // デフォルト18:00を設定
   let dueDate = null;
@@ -199,7 +204,7 @@ function saveTask() {
 
   if (editingTaskId) {
     // 更新
-    updateTask(editingTaskId, { title, memo, dueDate, duration });
+    updateTask(editingTaskId, { title, memo, dueDate, startTime, endTime, urgent, priority });
 
     // サブタスク保存
     const tasks = getTasks();
@@ -227,7 +232,39 @@ function saveTask() {
     });
   } else {
     // 新規作成
-    createTask(title, memo, dueDate, null, false, duration);
+    const tasks = getTasks();
+    const now = new Date().toISOString();
+    const task = {
+      id: generateUUID(),
+      title: title,
+      memo: memo,
+      dueDate: dueDate,
+      isCompleted: false,
+      createdAt: now,
+      updatedAt: now,
+      parentId: null,
+      isTutorial: false,
+      totalTime: 0,
+      isTimerRunning: false,
+      timerStartTime: null,
+      duration: null,
+      startTime: startTime,
+      endTime: endTime,
+      urgent: urgent,
+      priority: priority
+    };
+    tasks.unshift(task);
+    saveTasks(tasks);
+
+    // 履歴に追加
+    if (typeof addToTaskHistory === 'function') {
+      addToTaskHistory(task.title, task.startTime, task.endTime, 20);
+      try {
+        document.dispatchEvent(new CustomEvent('task:history:updated'));
+      } catch (e) {
+        console.warn('CustomEvent dispatch failed for task:history:updated', e);
+      }
+    }
   }
 
   closeModal();

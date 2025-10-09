@@ -19,7 +19,7 @@ const TRASH_RETENTION_DAYS = 30;
 let currentTab = 'tasks';
 let editingTaskId = null;
 // ========================================
-// 履歴管理（クイック入力で使う過去のタイトル）
+// 履歴管理（クイック入力で使う過去のタスク情報）
 // ========================================
 // 履歴を取得（配列、最新が先頭）
 function getTaskHistory(limit = 20) {
@@ -33,17 +33,30 @@ function saveTaskHistory(list) {
   return saveToStorage(STORAGE_KEYS.TASK_HISTORY, toSave);
 }
 
-// タイトルを履歴に追加（重複は削除、最新を先頭に、最大 limit 件）
-function addToTaskHistory(title, limit = 20) {
+// タスク情報を履歴に追加（重複は削除、最新を先頭に、最大 limit 件）
+function addToTaskHistory(title, startTime = null, endTime = null, limit = 20) {
   if (!title || typeof title !== 'string') return false;
   const trimmed = title.trim();
   if (trimmed.length === 0) return false;
 
   const history = loadFromStorage(STORAGE_KEYS.TASK_HISTORY, []);
-  // 既存の同一エントリを取り除く（大文字小文字を区別しない）
-  const normalized = history.filter(item => item.toLowerCase() !== trimmed.toLowerCase());
+
+  // 既存の同一タイトルエントリを取り除く（大文字小文字を区別しない）
+  const normalized = history.filter(item => {
+    const itemTitle = typeof item === 'string' ? item : (item.title || '');
+    return itemTitle.toLowerCase() !== trimmed.toLowerCase();
+  });
+
+  // 新しい履歴エントリ（タイトルと時間情報）
+  const newEntry = {
+    title: trimmed,
+    startTime: startTime || null,
+    endTime: endTime || null
+  };
+
   // 先頭に追加
-  normalized.unshift(trimmed);
+  normalized.unshift(newEntry);
+
   // 上限を超えたら切り詰め
   const limited = normalized.slice(0, limit);
   return saveToStorage(STORAGE_KEYS.TASK_HISTORY, limited);

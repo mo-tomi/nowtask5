@@ -264,6 +264,41 @@ function createTaskElement(task, level = 0) {
   const meta = document.createElement('div');
   meta.className = 'task-meta';
 
+  // 緊急ラベル
+  if (task.urgent) {
+    const urgentLabel = document.createElement('span');
+    urgentLabel.className = 'task-urgent-label';
+    urgentLabel.textContent = '🚨 緊急';
+    meta.appendChild(urgentLabel);
+  }
+
+  // 優先順位ラベル
+  if (task.priority) {
+    const priorityLabel = document.createElement('span');
+    priorityLabel.className = `task-priority-label ${task.priority}`;
+    const priorityText = {
+      high: '優先度: 高',
+      medium: '優先度: 中',
+      low: '優先度: 低'
+    };
+    priorityLabel.textContent = priorityText[task.priority] || '';
+    meta.appendChild(priorityLabel);
+  }
+
+  // 開始時刻・終了時刻
+  if (task.startTime || task.endTime) {
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'task-duration';
+    if (task.startTime && task.endTime) {
+      timeSpan.textContent = `🕒 ${task.startTime} ~ ${task.endTime}`;
+    } else if (task.startTime) {
+      timeSpan.textContent = `🕒 ${task.startTime} ~`;
+    } else if (task.endTime) {
+      timeSpan.textContent = `🕒 ~ ${task.endTime}`;
+    }
+    meta.appendChild(timeSpan);
+  }
+
   // サブタスク数表示（子タスクを持つ場合）
   const subtasks = getSubtasks(task.id);
   if (subtasks.length > 0) {

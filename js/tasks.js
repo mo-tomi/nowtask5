@@ -65,15 +65,19 @@ function createTask(title, memo = '', dueDate = null, parentId = null, isTutoria
     totalTime: 0,
     isTimerRunning: false,
     timerStartTime: null,
-    duration: duration // 所要時間（分）
+    duration: duration, // 所要時間（分） - 廃止予定
+    startTime: null, // 開始時刻 (HH:MM)
+    endTime: null, // 終了時刻 (HH:MM)
+    urgent: false, // 緊急フラグ
+    priority: '' // 優先順位 (high, medium, low, '')
   };
 
   const tasks = getTasks();
   tasks.unshift(task);
   saveTasks(tasks);
-  // タスクタイトルを履歴に追加（core.js の addToTaskHistory を使用）
+  // タスク情報を履歴に追加（core.js の addToTaskHistory を使用）
   if (typeof addToTaskHistory === 'function') {
-    addToTaskHistory(task.title, 20);
+    addToTaskHistory(task.title, task.startTime, task.endTime, 20);
     // 履歴が更新されたことを通知するカスタムイベント
     try {
       document.dispatchEvent(new CustomEvent('task:history:updated'));
