@@ -7,7 +7,11 @@
       "Bash(move modals.js js )",
       "Bash(move gauge.js js )",
       "Bash(move events.js js )",
-      "Bash(move ui-main.js js)"
+      "Bash(move ui-main.js js)",
+      "Bash(git restore:*)",
+      "Bash(git clean:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

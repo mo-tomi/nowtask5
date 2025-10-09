@@ -312,8 +312,15 @@ function confirmAction(message, callback) {
 
 // 設定モーダルを開く
 function openSettingsModal() {
+  console.log('openSettingsModal called');
   renderRoutinesList();
-  document.getElementById('settings-modal').classList.add('show');
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.classList.add('show');
+    console.log('Modal classList:', modal.classList);
+  } else {
+    console.error('settings-modal not found');
+  }
 }
 
 // ルーティンリストを描画
