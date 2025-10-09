@@ -117,6 +117,18 @@ function updateScheduledTasks(dateArg) {
   const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
   const freeTimeMinutes = totalMinutesInDay - currentMinutesFromMidnight - totalDurationMinutes;
 
+  // 自由時間ゲージ更新
+  const freeBar = document.getElementById('time-gauge-free');
+  if (freeTimeMinutes > 0) {
+    const freeStartPercent = (currentMinutes / (24 * 60)) * 100 + (totalDurationMinutes / (24 * 60)) * 100;
+    const freeWidthPercent = (freeTimeMinutes / (24 * 60)) * 100;
+    freeBar.style.display = 'block';
+    freeBar.style.left = `${freeStartPercent}%`;
+    freeBar.style.width = `${Math.min(freeWidthPercent, 100 - freeStartPercent)}%`;
+  } else {
+    freeBar.style.display = 'none';
+  }
+
   // 自由時間を表示
   const remainingElement = document.getElementById('remaining-tasks');
 

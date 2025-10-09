@@ -49,7 +49,7 @@
               <polyline points="12 7 12 12 15 15"></polyline>
             </svg>
           </button>
-          <button class="quick-icon-btn" id="quick-date-btn" type="button" title="期限日時を設定">
+          <button class="quick-icon-btn" id="quick-date-btn" type="button" title="日時を設定">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -65,10 +65,24 @@
           </button>
         </div>
       </div>
-      <input type="datetime-local" id="quick-add-date" class="quick-date-input" style="display: none;">
-      <select id="quick-add-history" class="quick-add-history-dropdown" title="過去の入力" style="display: none;">
-        <option value="">履歴</option>
-      </select>
+      <!-- 日時設定パネル -->
+      <div id="quick-datetime-panel" class="quick-datetime-panel" style="display: none;">
+        <div class="quick-datetime-row">
+          <label>期限日:</label>
+          <input type="date" id="quick-add-date" class="quick-date-input-inline">
+        </div>
+        <div class="quick-datetime-row">
+          <label>開始:</label>
+          <input type="time" id="quick-add-start-time" class="quick-time-input-inline">
+        </div>
+        <div class="quick-datetime-row">
+          <label>終了:</label>
+          <input type="time" id="quick-add-end-time" class="quick-time-input-inline">
+        </div>
+        <button type="button" id="quick-datetime-close" class="quick-datetime-close">×</button>
+      </div>
+      <!-- 履歴タグボタン -->
+      <div id="quick-history-tags" class="quick-history-tags"></div>
     </form>
   </header>
 
@@ -89,6 +103,7 @@
           <div class="time-gauge-bg"></div>
           <div class="time-gauge-elapsed" id="time-gauge-elapsed"></div>
           <div class="time-gauge-scheduled" id="time-gauge-scheduled"></div>
+          <div class="time-gauge-free" id="time-gauge-free"></div>
           <div class="time-marker" id="time-marker"></div>
         </div>
         <div class="time-gauge-labels">

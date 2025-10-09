@@ -119,35 +119,32 @@ function initEventListeners() {
   const quickInput = document.getElementById('quick-add-input');
   const quickAddForm = document.getElementById('quick-add-form');
   const quickDateBtn = document.getElementById('quick-date-btn');
+  const quickDatetimePanel = document.getElementById('quick-datetime-panel');
   const quickDateInput = document.getElementById('quick-add-date');
+  const quickStartTime = document.getElementById('quick-add-start-time');
+  const quickEndTime = document.getElementById('quick-add-end-time');
+  const quickDatetimeClose = document.getElementById('quick-datetime-close');
   const quickHistoryBtn = document.getElementById('quick-history-btn');
-  const quickHistorySelect = document.getElementById('quick-add-history');
-
-  // 履歴ボタンのクリック
-  if (quickHistoryBtn) {
-    quickHistoryBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (quickHistorySelect.style.display === 'none') {
-        quickHistorySelect.style.display = 'block';
-        quickHistorySelect.focus();
-      } else {
-        quickHistorySelect.style.display = 'none';
-      }
-    });
-  }
+  const quickHistoryTags = document.getElementById('quick-history-tags');
 
   // カレンダーボタンのクリック
   quickDateBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (quickDateInput.style.display === 'none') {
-      quickDateInput.style.display = 'block';
-      quickDateInput.showPicker();
+    if (quickDatetimePanel.style.display === 'none') {
+      quickDatetimePanel.style.display = 'block';
     } else {
-      quickDateInput.style.display = 'none';
+      quickDatetimePanel.style.display = 'none';
     }
   });
+
+  // 日時パネルを閉じる
+  if (quickDatetimeClose) {
+    quickDatetimeClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      quickDatetimePanel.style.display = 'none';
+    });
+  }
 
   // 日時選択時
   quickDateInput.addEventListener('change', () => {
@@ -158,24 +155,19 @@ function initEventListeners() {
     }
   });
 
-  // 日時入力欄の外側クリックで閉じる
+  // パネルの外側クリックで閉じる
   document.addEventListener('click', (e) => {
-    if (!quickDateInput.contains(e.target) && !quickDateBtn.contains(e.target)) {
-      quickDateInput.style.display = 'none';
-    }
-    if (quickHistorySelect && !quickHistorySelect.contains(e.target) &&
-        quickHistoryBtn && !quickHistoryBtn.contains(e.target)) {
-      quickHistorySelect.style.display = 'none';
+    if (quickDatetimePanel && !quickDatetimePanel.contains(e.target) && !quickDateBtn.contains(e.target)) {
+      quickDatetimePanel.style.display = 'none';
     }
   });
-
-  // 履歴選択時に使う時間情報を保持
-  let selectedHistoryTime = { startTime: null, endTime: null };
 
   quickAddForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (quickInput.value.trim()) {
       const title = quickInput.value.trim();
+      const startTime = quickStartTime.value || null;
+      const endTime = quickEndTime.value || null;
 
       // デフォルト18:00を設定
       let dueDate = null;
@@ -186,7 +178,7 @@ function initEventListeners() {
         dueDate = new Date(dateTimeStr).toISOString();
       }
 
-      // 新規タスク作成（履歴から取得した時間情報を使用）
+      // 新規タスク作成
       const tasks = getTasks();
       const now = new Date().toISOString();
       const task = {
@@ -203,8 +195,8 @@ function initEventListeners() {
         isTimerRunning: false,
         timerStartTime: null,
         duration: null,
-        startTime: selectedHistoryTime.startTime,
-        endTime: selectedHistoryTime.endTime,
+        startTime: startTime,
+        endTime: endTime,
         urgent: false,
         priority: ''
       };
@@ -222,72 +214,96 @@ function initEventListeners() {
       }
 
       quickInput.value = '';
-      selectedHistoryTime = { startTime: null, endTime: null };
-      // 履歴セレクトを先頭表示に戻す
-      if (quickHistorySelect) quickHistorySelect.selectedIndex = 0;
       quickDateInput.value = '';
-      quickDateInput.style.display = 'none';
+      quickStartTime.value = '';
+      quickEndTime.value = '';
+      quickDatetimePanel.style.display = 'none';
       quickDateBtn.classList.remove('has-date');
       renderTasks();
     }
   });
 
-  // ---- 履歴セレクトの初期化とイベント ----
-  function renderQuickHistory() {
-    if (!quickHistorySelect) return;
-    quickHistorySelect.innerHTML = '';
+  // ---- 履歴タグの初期化とイベント ----
+  function renderHistoryTags() {
+    if (!quickHistoryTags) return;
+    quickHistoryTags.innerHTML = '';
 
-    // プレースホルダーを新規作成して追加
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = '履歴から選択';
-    quickHistorySelect.appendChild(placeholder);
-
-    // getTaskHistory は core.js にて実装
-    const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
-    history.forEach((item, index) => {
-      const opt = document.createElement('option');
-      // 履歴データは { title, startTime, endTime } または 文字列の可能性がある
+    const history = typeof getTaskHistory === 'function' ? getTaskHistory(10) : [];
+    history.forEach((item) => {
       const itemTitle = typeof item === 'string' ? item : (item.title || '');
-      opt.value = index; // インデックスを値として保存
-      opt.textContent = itemTitle;
-      quickHistorySelect.appendChild(opt);
+      const itemStartTime = typeof item === 'object' ? item.startTime : null;
+      const itemEndTime = typeof item === 'object' ? item.endTime : null;
+
+      const tag = document.createElement('button');
+      tag.type = 'button';
+      tag.className = 'quick-history-tag';
+      tag.textContent = itemTitle;
+      tag.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // タスクを即座に作成
+        const tasks = getTasks();
+        const now = new Date().toISOString();
+        const task = {
+          id: generateUUID(),
+          title: itemTitle,
+          memo: '',
+          dueDate: null,
+          isCompleted: false,
+          createdAt: now,
+          updatedAt: now,
+          parentId: null,
+          isTutorial: false,
+          totalTime: 0,
+          isTimerRunning: false,
+          timerStartTime: null,
+          duration: null,
+          startTime: itemStartTime,
+          endTime: itemEndTime,
+          urgent: false,
+          priority: ''
+        };
+        tasks.unshift(task);
+        saveTasks(tasks);
+
+        // 履歴を更新
+        if (typeof addToTaskHistory === 'function') {
+          addToTaskHistory(task.title, task.startTime, task.endTime, 20);
+          try {
+            document.dispatchEvent(new CustomEvent('task:history:updated'));
+          } catch (e) {
+            console.warn('CustomEvent dispatch failed', e);
+          }
+        }
+
+        renderTasks();
+      });
+
+      quickHistoryTags.appendChild(tag);
     });
   }
 
-  if (quickHistorySelect) {
-    // 初期描画
-    renderQuickHistory();
-
-    // 履歴選択時に入力欄へ自動入力＆時間情報を保持
-    quickHistorySelect.addEventListener('change', (e) => {
-      const index = parseInt(e.target.value);
-      if (!isNaN(index)) {
-        const history = typeof getTaskHistory === 'function' ? getTaskHistory(20) : [];
-        const item = history[index];
-        if (item) {
-          const itemTitle = typeof item === 'string' ? item : (item.title || '');
-          const itemStartTime = typeof item === 'object' ? item.startTime : null;
-          const itemEndTime = typeof item === 'object' ? item.endTime : null;
-
-          quickInput.value = itemTitle;
-          selectedHistoryTime = {
-            startTime: itemStartTime,
-            endTime: itemEndTime
-          };
-
-          // フォーカスを入力欄に移す
-          quickInput.focus();
-          quickHistorySelect.style.display = 'none';
-        }
+  // 履歴ボタンのクリック（履歴タグの表示/非表示を切り替え）
+  if (quickHistoryBtn) {
+    quickHistoryBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (quickHistoryTags.style.display === 'none' || !quickHistoryTags.style.display) {
+        quickHistoryTags.style.display = 'flex';
+      } else {
+        quickHistoryTags.style.display = 'none';
       }
     });
-
-    // 履歴はタスク作成時に更新されるため、カスタムイベントで再描画
-    document.addEventListener('task:history:updated', () => {
-      renderQuickHistory();
-    });
   }
+
+  // 初期描画
+  renderHistoryTags();
+
+  // 履歴更新時に再描画
+  document.addEventListener('task:history:updated', () => {
+    renderHistoryTags();
+  });
   
   // サブタスク追加ボタン
   document.getElementById('add-subtask-btn').addEventListener('click', () => {

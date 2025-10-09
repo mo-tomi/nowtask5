@@ -155,45 +155,100 @@ body {
   background: #333333;
 }
 
-.quick-date-input {
-  position: absolute;
-  top: 100%;
-  right: 0;
+.quick-datetime-panel {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
   margin-top: 8px;
-  padding: 8px;
-  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.quick-datetime-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.quick-datetime-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  min-width: 50px;
+}
+
+.quick-date-input-inline,
+.quick-time-input-inline {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-size: 14px;
   background-color: white;
   color: #333;
-  cursor: pointer;
   outline: none;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s ease;
 }
 
-.quick-date-input::-webkit-calendar-picker-indicator {
-  cursor: pointer;
+.quick-date-input-inline:focus,
+.quick-time-input-inline:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-.quick-add-history-dropdown {
+.quick-datetime-close {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 8px;
-  padding: 8px;
-  border: 2px solid white;
-  border-radius: 4px;
-  font-size: 14px;
-  background-color: white;
-  color: #333;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #757575;
   cursor: pointer;
-  outline: none;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  max-height: 200px;
-  overflow-y: auto;
+  line-height: 1;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.quick-datetime-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.quick-history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.quick-history-tag {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.quick-history-tag:hover {
+  background: white;
+  border-color: white;
+  transform: scale(1.05);
 }
 
 /* タブナビゲーションのスタイルは廃止済み */
@@ -295,6 +350,15 @@ body {
   border-right: 2px solid #333333;
   transition: all 0.3s ease;
   z-index: 2;
+}
+
+.time-gauge-free {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(33, 150, 243, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1;
 }
 
 .time-marker {
@@ -635,6 +699,13 @@ body {
   color: #000000;
 }
 
+.task-card-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .add-subtask-icon {
   background: rgba(0, 0, 0, 0.1);
   border: 1px solid #000000;
@@ -660,6 +731,35 @@ body {
 }
 
 .add-subtask-icon:active {
+  transform: scale(0.95);
+}
+
+.task-menu-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #757575;
+  font-size: 20px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.task-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000000;
+  transform: scale(1.1);
+}
+
+.task-menu-btn:active {
   transform: scale(0.95);
 }
 

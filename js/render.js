@@ -406,6 +406,10 @@ function createTaskElement(task, level = 0) {
   div.appendChild(checkbox);
   div.appendChild(content);
 
+  // タスクアクション部分
+  const actions = document.createElement('div');
+  actions.className = 'task-card-actions';
+
   // サブタスク追加ボタン（タスク内に表示）
   if (!task.isCompleted && canHaveSubtask(task.id)) {
     const addSubtaskIcon = document.createElement('button');
@@ -417,12 +421,27 @@ function createTaskElement(task, level = 0) {
       addingSubtaskForTaskId = task.id;
       renderTasks();
     });
-    div.appendChild(addSubtaskIcon);
+    actions.appendChild(addSubtaskIcon);
   }
 
-  // クリックで編集
-  div.addEventListener('click', () => {
+  // メニューボタン
+  const menuBtn = document.createElement('button');
+  menuBtn.className = 'task-menu-btn';
+  menuBtn.innerHTML = '⋮';
+  menuBtn.title = 'メニュー';
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     openEditModal(task.id);
+  });
+  actions.appendChild(menuBtn);
+
+  div.appendChild(actions);
+
+  // カード全体のクリックで編集（チェックボックスとボタン以外）
+  div.addEventListener('click', (e) => {
+    if (!e.target.closest('.task-checkbox') && !e.target.closest('.task-card-actions')) {
+      openEditModal(task.id);
+    }
   });
 
   return div;
