@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nowtask-v1.0.0';
+const CACHE_NAME = 'nowtask-v1.1.0';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -51,36 +51,35 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// フェッチ時のキャッシュ戦略（Cache First）
+// フェッチ時のキャッシュ戦略（Network First - 常に最新を取得）
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // キャッシュがあればそれを返す
-        if (response) {
+        // 有効なレスポンスかチェック
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
 
-        // キャッシュになければネットワークから取得
-        return fetch(event.request).then(response => {
-          // 有効なレスポンスかチェック
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
+        // レスポンスをクローンしてキャッシュに保存
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME)
+          .then(cache => {
+            cache.put(event.request, responseToCache);
+          });
 
-          // レスポンスをクローンしてキャッシュに保存
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
-        });
+        return response;
       })
       .catch(() => {
-        // オフライン時のフォールバック（必要に応じて追加）
-        return caches.match('/index.html');
+        // ネットワークエラー時はキャッシュから返す（オフライン対応）
+        return caches.match(event.request)
+          .then(response => {
+            if (response) {
+              return response;
+            }
+            // キャッシュもなければindex.htmlを返す
+            return caches.match('/index.html');
+          });
       })
   );
 });
