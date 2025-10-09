@@ -332,14 +332,23 @@ function openSettingsModal() {
 // ルーティンリストを描画
 function renderRoutinesList() {
   try {
+    console.log('renderRoutinesList called');
     const routines = getRoutines();
+    console.log('Routines:', routines);
     const container = document.getElementById('routines-list');
     if (!container) {
       console.error('routines-list container not found');
       return;
     }
+    console.log('Container found:', container);
     container.innerHTML = '';
 
+  if (!Array.isArray(routines)) {
+    console.error('Routines is not an array:', routines);
+    return;
+  }
+
+  console.log('Rendering', routines.length, 'routines');
   routines.forEach((routine, index) => {
     const item = document.createElement('div');
     item.className = 'routine-item';
@@ -413,13 +422,30 @@ function deleteRoutine(index) {
 
 // ルーティンを追加
 function addRoutine() {
-  const routines = getRoutines();
+  // 現在の入力内容を保存してから新しいルーティンを追加
+  const nameInputs = document.querySelectorAll('.routine-name-input');
+  const durationInputs = document.querySelectorAll('.routine-duration-input');
+  const routines = [];
+
+  nameInputs.forEach((nameInput, index) => {
+    const name = nameInput.value.trim();
+    const existingRoutines = getRoutines();
+    const routine = {
+      id: existingRoutines[index]?.id || generateUUID(),
+      name: name,
+      duration: parseInt(durationInputs[index].value)
+    };
+    routines.push(routine);
+  });
+
+  // 新しい空のルーティンを追加
   const newRoutine = {
     id: generateUUID(),
     name: '',
     duration: 30
   };
   routines.push(newRoutine);
+
   saveRoutines(routines);
   renderRoutinesList();
 
