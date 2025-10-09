@@ -424,18 +424,42 @@ function updateScheduledTasks(dateArg) {
     freeBar.style.display = 'none';
   }
 
-  // 自由時間を表示
+  // タスク密度を計算して表示
   const remainingElement = document.getElementById('remaining-tasks');
+  const gaugeContainer = document.querySelector('.time-gauge-container');
 
+  // 密度 = タスク時間 / 残り時間（経過時刻から24時まで）
+  const remainingTimeInDay = totalMinutesInDay - currentMinutesFromMidnight;
+  const densityPercent = remainingTimeInDay > 0 ? (totalDurationMinutes / remainingTimeInDay) * 100 : 100;
+
+  // 密度レベルを判定
+  let densityLevel = 'green'; // デフォルト: 余裕あり
+  let densityEmoji = '🟢';
+
+  if (densityPercent >= 100) {
+    // レッド警報: タスクびっしり、無理がある
+    densityLevel = 'red';
+    densityEmoji = '🔴';
+  } else if (densityPercent >= 70) {
+    // イエロー警報: タスク多め、頑張れば終わる
+    densityLevel = 'yellow';
+    densityEmoji = '🟡';
+  }
+
+  // ゲージコンテナに密度クラスを設定
+  gaugeContainer.classList.remove('density-green', 'density-yellow', 'density-red');
+  gaugeContainer.classList.add(`density-${densityLevel}`);
+
+  // 自由時間を表示
   if (freeTimeMinutes < 0) {
     // 予定がオーバーしている場合
     const overMinutes = Math.abs(freeTimeMinutes);
     const overHours = Math.floor(overMinutes / 60);
     const overMins = overMinutes % 60;
     if (overHours > 0) {
-      remainingElement.textContent = overMins > 0 ? `超過: ${overHours}時間${overMins}分` : `超過: ${overHours}時間`;
+      remainingElement.textContent = `${densityEmoji} 超過: ${overHours}時間${overMins > 0 ? overMins + '分' : ''}`;
     } else {
-      remainingElement.textContent = `超過: ${overMins}分`;
+      remainingElement.textContent = `${densityEmoji} 超過: ${overMins}分`;
     }
   } else {
     // 自由時間を表示
@@ -443,11 +467,11 @@ function updateScheduledTasks(dateArg) {
     const minutes = freeTimeMinutes % 60;
 
     if (hours > 0) {
-      remainingElement.textContent = minutes > 0 ? `自由: ${hours}時間${minutes}分` : `自由: ${hours}時間`;
+      remainingElement.textContent = `${densityEmoji} 自由: ${hours}時間${minutes > 0 ? minutes + '分' : ''}`;
     } else if (minutes > 0) {
-      remainingElement.textContent = `自由: ${minutes}分`;
+      remainingElement.textContent = `${densityEmoji} 自由: ${minutes}分`;
     } else {
-      remainingElement.textContent = '自由: 0分';
+      remainingElement.textContent = `${densityEmoji} 自由: 0分`;
     }
   }
 }
