@@ -227,10 +227,31 @@ body {
 }
 
 .quick-history-tags {
-  display: flex;
-  flex-wrap: wrap;
+  display: none;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-history-tags::-webkit-scrollbar {
+  height: 4px;
+}
+
+.quick-history-tags::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.quick-history-tags::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.quick-history-tags::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .quick-history-tag {

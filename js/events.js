@@ -289,15 +289,15 @@ function initEventListeners() {
     quickHistoryBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (quickHistoryTags.style.display === 'none' || !quickHistoryTags.style.display) {
-        quickHistoryTags.style.display = 'flex';
-      } else {
-        quickHistoryTags.style.display = 'none';
-      }
+      const isVisible = quickHistoryTags.style.display === 'flex';
+      quickHistoryTags.style.display = isVisible ? 'none' : 'flex';
     });
   }
 
-  // 初期描画
+  // 初期描画（最初は表示）
+  if (quickHistoryTags) {
+    quickHistoryTags.style.display = 'flex';
+  }
   renderHistoryTags();
 
   // 履歴更新時に再描画
