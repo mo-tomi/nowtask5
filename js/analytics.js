@@ -195,6 +195,7 @@ function openAnalyticsModal() {
   renderFreeTimeStats();
 
   // モーダルを表示
+  modal.style.display = 'flex';
   modal.classList.add('show');
 }
 
@@ -205,6 +206,7 @@ function closeAnalyticsModal() {
   const modal = document.getElementById('analytics-modal');
   if (!modal) return;
 
+  modal.style.display = 'none';
   modal.classList.remove('show');
 }
 
