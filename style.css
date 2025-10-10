@@ -2633,6 +2633,7 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
+  width: 100%;
 }
 
 .calendar-weekday {
@@ -2647,7 +2648,7 @@ body {
   aspect-ratio: 1;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 8px;
+  padding: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -2655,6 +2656,8 @@ body {
   align-items: center;
   justify-content: flex-start;
   background: white;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .calendar-day.empty {
@@ -2677,6 +2680,10 @@ body {
 
 .calendar-day.today .calendar-day-number {
   color: white;
+}
+
+.calendar-day.today .calendar-task-count {
+  color: #ddd;
 }
 
 .calendar-day-number {
@@ -2718,22 +2725,47 @@ body {
 
 @media (max-width: 600px) {
   .calendar-grid {
-    gap: 4px;
+    gap: 2px;
   }
 
   .calendar-day {
-    padding: 4px;
+    padding: 2px;
+    border-radius: 4px;
   }
 
   .calendar-day-number {
-    font-size: 14px;
+    font-size: 12px;
+    margin-bottom: 2px;
   }
 
   .calendar-task-count {
-    font-size: 10px;
+    font-size: 9px;
+    margin-bottom: 1px;
   }
 
   .calendar-task-status {
-    font-size: 9px;
+    font-size: 8px;
+    gap: 2px;
+  }
+
+  .incomplete-dot,
+  .complete-dot {
+    width: 4px;
+    height: 4px;
+  }
+
+  .calendar-weekday {
+    font-size: 10px;
+    padding: 4px 0;
+  }
+
+  .calendar-nav-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .calendar-current-month {
+    font-size: 16px;
   }
 }

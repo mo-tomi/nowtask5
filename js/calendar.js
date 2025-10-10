@@ -126,10 +126,16 @@ function renderCalendar() {
       dateCell.appendChild(taskStatus);
     }
 
-    // クリックイベント: その日のタスク一覧に移動
+    // クリックイベント: タスクがあればスクロール、なければ新規作成
     dateCell.addEventListener('click', () => {
       closeCalendarModal();
-      scrollToDate(dateStr);
+      if (dateTasks.length > 0) {
+        // タスクがある場合はスクロール
+        scrollToDate(dateStr);
+      } else {
+        // タスクがない場合は新規作成モーダルを開く
+        openCreateModalForDate(dateStr);
+      }
     });
 
     grid.appendChild(dateCell);
@@ -181,4 +187,18 @@ function goToNextMonth() {
     currentCalendarYear++;
   }
   renderCalendar();
+}
+
+/**
+ * 指定日付の新規タスク作成モーダルを開く
+ */
+function openCreateModalForDate(dateStr) {
+  openCreateModal();
+  // モーダルが開いた後に日付を設定
+  setTimeout(() => {
+    const dateInput = document.getElementById('task-due-date');
+    if (dateInput) {
+      dateInput.value = dateStr;
+    }
+  }, 0);
 }
