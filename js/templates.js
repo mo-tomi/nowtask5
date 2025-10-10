@@ -181,6 +181,11 @@ function applyTemplate(template) {
     if (charCount) {
       charCount.textContent = template.name.length;
     }
+    // 保存ボタンを有効化
+    const saveBtn = document.getElementById('save-btn');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+    }
   }
 
   // メモ
