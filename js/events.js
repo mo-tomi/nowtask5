@@ -233,9 +233,14 @@ function initEventListeners() {
   });
 
   // 保存ボタン
-  document.getElementById('save-btn').addEventListener('click', () => {
+  const saveBtnElement = document.getElementById('save-btn');
+  const handleSaveTask = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     saveTask();
-  });
+  };
+  saveBtnElement.addEventListener('click', handleSaveTask);
+  saveBtnElement.addEventListener('touchend', handleSaveTask);
 
   // 削除ボタン
   document.getElementById('delete-btn').addEventListener('click', () => {
