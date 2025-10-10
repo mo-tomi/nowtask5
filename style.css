@@ -127,7 +127,7 @@ body {
 .quick-add #quick-add-input {
   flex: 1;
   padding: 12px 14px;
-  padding-right: 110px;
+  padding-right: 80px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
