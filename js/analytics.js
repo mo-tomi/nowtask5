@@ -3,16 +3,25 @@
 // ========================================
 
 /**
- * タスクランキングを取得（完了したタスクをtotalTimeでソート）
+ * タスクランキングを取得（完了したタスクをtotalTimeまたはdurationでソート）
  * @returns {Array} TOP5のタスクリスト
  */
 function getTaskRanking() {
   const tasks = getTasks();
 
-  // 完了したタスクのみを抽出し、totalTimeでソート
+  // 完了したタスクのみを抽出し、totalTimeまたはdurationでソート
   const completedTasks = tasks
-    .filter(task => task.isCompleted && task.totalTime > 0)
-    .sort((a, b) => b.totalTime - a.totalTime)
+    .filter(task => {
+      if (!task.isCompleted) return false;
+      // totalTimeまたはdurationがある場合のみ含める
+      return (task.totalTime && task.totalTime > 0) || (task.duration && task.duration > 0);
+    })
+    .map(task => {
+      // totalTimeを秒単位、durationを分単位から秒単位に変換
+      const timeInSeconds = task.totalTime || (task.duration * 60) || 0;
+      return { ...task, timeInSeconds };
+    })
+    .sort((a, b) => b.timeInSeconds - a.timeInSeconds)
     .slice(0, 5); // TOP5のみ
 
   return completedTasks;
@@ -50,8 +59,9 @@ function renderTaskRanking() {
       medal = '🥉';
     }
 
-    const hours = Math.floor(task.totalTime / 3600);
-    const minutes = Math.floor((task.totalTime % 3600) / 60);
+    // timeInSecondsを使用して時間を計算
+    const hours = Math.floor(task.timeInSeconds / 3600);
+    const minutes = Math.floor((task.timeInSeconds % 3600) / 60);
     const timeText = hours > 0 ? `${hours}時間${minutes}分` : `${minutes}分`;
 
     return `
@@ -138,21 +148,11 @@ function renderFreeTimeStats() {
     return { hours: h, minutes: m };
   };
 
-  const todayTime = formatTime(todayFreeTime);
   const avg7Time = formatTime(avg7Days);
   const avg30Time = formatTime(avg30Days);
   const avgAllTimeFormatted = formatTime(avgAllTime);
 
   container.innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">今日の空き時間</div>
-      <div>
-        <span class="stat-value">${todayTime.hours}</span>
-        <span class="stat-unit">時間</span>
-        <span class="stat-value">${todayTime.minutes}</span>
-        <span class="stat-unit">分</span>
-      </div>
-    </div>
     <div class="stat-card">
       <div class="stat-label">7日間平均</div>
       <div>

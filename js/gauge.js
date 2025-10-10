@@ -20,8 +20,8 @@ function changeGaugeDate(offset) {
   date.setDate(date.getDate() + offset);
   currentGaugeDate = formatDateISO(date);
 
-  updateTimeGauge(currentGaugeDate);
   updateGaugeDateLabel();
+  updateTimeGauge(currentGaugeDate);
 }
 
 // 日付ラベルを更新
@@ -37,18 +37,19 @@ function updateGaugeDateLabel() {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+  const weekday = weekdays[date.getDay()];
+
   if (formatDateISO(date) === formatDateISO(today)) {
-    labelEl.textContent = '今日の予定';
+    labelEl.textContent = `今日 ${month}月${day}日(${weekday})`;
   } else if (formatDateISO(date) === formatDateISO(tomorrow)) {
-    labelEl.textContent = '明日の予定';
+    labelEl.textContent = `明日 ${month}月${day}日(${weekday})`;
   } else if (formatDateISO(date) === formatDateISO(yesterday)) {
-    labelEl.textContent = '昨日の予定';
+    labelEl.textContent = `昨日 ${month}月${day}日(${weekday})`;
   } else {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    const weekday = weekdays[date.getDay()];
-    labelEl.textContent = `${month}月${day}日(${weekday})の予定`;
+    labelEl.textContent = `${month}月${day}日(${weekday})`;
   }
 }
 

@@ -425,6 +425,16 @@ body {
   flex-wrap: wrap;
 }
 
+/* 日付ラベル */
+.gauge-date-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
 /* 現在時刻表示 - シンプルでクリア */
 .current-time {
   font-size: 36px;
@@ -700,6 +710,32 @@ body {
   border-radius: 16px;
   white-space: nowrap;
   letter-spacing: 0.5px;
+}
+
+/* 明日のタスク追加ボタン */
+.add-tomorrow-task-btn {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 12px 0 24px 0;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px dashed #000000;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.add-tomorrow-task-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-style: solid;
+  transform: translateY(-2px);
+}
+
+.add-tomorrow-task-btn:active {
+  transform: translateY(0);
 }
 
 .task-item {
@@ -1694,6 +1730,41 @@ body {
 }
 
 /* ========================================
+   タスク内時間ゲージバー
+   ======================================== */
+.task-time-gauge-wrapper {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.task-time-gauge {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+}
+
+.task-time-gauge-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+}
+
+.task-time-gauge-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #333333, #000000);
+  transition: all 0.3s ease;
+  border-radius: 3px;
+}
+
+/* ========================================
    レスポンシブ対応
    ======================================== */
 @media (max-width: 600px) {
@@ -1834,7 +1905,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  min-width: 180px;
+  min-width: 200px;
+  max-width: 90vw;
   overflow: hidden;
 }
 
@@ -1847,6 +1919,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .task-context-menu .menu-item:hover {
@@ -1855,6 +1930,17 @@ body {
 
 .task-context-menu .menu-item:active {
   background-color: #e0e0e0;
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+  .task-context-menu {
+    left: 50% !important;
+    transform: translateX(-50%);
+    right: auto !important;
+    min-width: 85vw;
+    max-width: 85vw;
+  }
 }
 
 /* ========================================

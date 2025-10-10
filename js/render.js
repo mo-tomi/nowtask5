@@ -178,6 +178,22 @@ function renderTasks() {
       dateTasks.forEach(task => {
         renderTaskWithSubtasks(task, tasksList, false);
       });
+
+      // 明日のタスクの場合、追加ボタンを表示
+      if (date === 'tomorrow') {
+        const addTomorrowBtn = document.createElement('button');
+        addTomorrowBtn.className = 'add-tomorrow-task-btn';
+        addTomorrowBtn.innerHTML = '+ 明日のタスクを追加';
+        addTomorrowBtn.addEventListener('click', () => {
+          // 明日の日付を設定してモーダルを開く
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowISO = formatDateISO(tomorrow);
+          openTaskModal();
+          document.getElementById('task-due-date').value = tomorrowISO;
+        });
+        tasksList.appendChild(addTomorrowBtn);
+      }
     });
   }
 
@@ -399,6 +415,42 @@ function createTaskElement(task, level = 0) {
       durationSpan.textContent = `⏰ ${minutes}分`;
     }
     meta.appendChild(durationSpan);
+  }
+
+  // 時間ゲージバー（開始時刻と終了時刻がある場合）
+  if (task.startTime && task.endTime && !task.isCompleted) {
+    const [startHour, startMin] = task.startTime.split(':').map(Number);
+    const [endHour, endMin] = task.endTime.split(':').map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    let endMinutes = endHour * 60 + endMin;
+
+    // 日をまたぐ場合は24時までとして計算
+    if (endMinutes < startMinutes) {
+      endMinutes = 24 * 60;
+    }
+
+    const duration = endMinutes - startMinutes;
+    const leftPercent = (startMinutes / (24 * 60)) * 100;
+    const widthPercent = (duration / (24 * 60)) * 100;
+
+    const gaugeWrapper = document.createElement('div');
+    gaugeWrapper.className = 'task-time-gauge-wrapper';
+
+    const gauge = document.createElement('div');
+    gauge.className = 'task-time-gauge';
+
+    const gaugeBg = document.createElement('div');
+    gaugeBg.className = 'task-time-gauge-bg';
+
+    const gaugeBar = document.createElement('div');
+    gaugeBar.className = 'task-time-gauge-bar';
+    gaugeBar.style.left = `${leftPercent}%`;
+    gaugeBar.style.width = `${widthPercent}%`;
+
+    gauge.appendChild(gaugeBg);
+    gauge.appendChild(gaugeBar);
+    gaugeWrapper.appendChild(gauge);
+    content.appendChild(gaugeWrapper);
   }
 
   if (task.dueDate) {
