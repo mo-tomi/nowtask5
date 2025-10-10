@@ -7,11 +7,11 @@
  * @returns {Array} TOP5のタスクリスト
  */
 function getTaskRanking() {
-  const tasks = getAllTasks();
+  const tasks = getTasks();
 
   // 完了したタスクのみを抽出し、totalTimeでソート
   const completedTasks = tasks
-    .filter(task => task.completed && task.totalTime > 0)
+    .filter(task => task.isCompleted && task.totalTime > 0)
     .sort((a, b) => b.totalTime - a.totalTime)
     .slice(0, 5); // TOP5のみ
 
