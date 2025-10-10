@@ -94,7 +94,6 @@ let currentFilter = null; // 'urgent' | 'high-priority' | null
 // タスクリスト表示
 function renderTasks() {
   const tasks = getTasks();
-  const trash = loadFromStorage(STORAGE_KEYS.TRASH, []);
 
   // 並び替え設定を取得（localStorage から復元）
   const savedSort = loadFromStorage(STORAGE_KEYS.SORT_PREFERENCE, 'time');
@@ -221,20 +220,6 @@ function renderTasks() {
 
     completedTasks.forEach(task => {
       renderTaskWithSubtasks(task, completedList, true);
-    });
-  }
-
-  // ゴミ箱タブ
-  const trashList = document.getElementById('trash-list');
-  const trashEmpty = document.getElementById('trash-empty');
-  trashList.innerHTML = '';
-
-  if (trash.length === 0) {
-    trashEmpty.classList.add('show');
-  } else {
-    trashEmpty.classList.remove('show');
-    trash.forEach(task => {
-      trashList.appendChild(createTrashElement(task));
     });
   }
 
@@ -531,69 +516,6 @@ function createTaskElement(task, level = 0) {
 
   // ドラッグ&ドロップ機能
   setupDragAndDrop(div, task);
-
-  return div;
-}
-
-// ゴミ箱要素作成
-function createTrashElement(task) {
-  const div = document.createElement('div');
-  div.className = 'task-item';
-  div.dataset.id = task.id;
-
-  const content = document.createElement('div');
-  content.className = 'task-content';
-
-  const title = document.createElement('div');
-  title.className = 'task-title';
-  title.textContent = task.title;
-  content.appendChild(title);
-
-  const meta = document.createElement('div');
-  meta.className = 'task-meta';
-  meta.textContent = '削除日: ' + formatDateTime(task.deletedAt);
-  content.appendChild(meta);
-
-  if (task.memo) {
-    const memo = document.createElement('div');
-    memo.className = 'task-memo';
-    memo.textContent = task.memo.substring(0, 100) + (task.memo.length > 100 ? '...' : '');
-    content.appendChild(memo);
-  }
-
-  div.appendChild(content);
-
-  // アクション部分
-  const actions = document.createElement('div');
-  actions.className = 'task-actions';
-
-  const restoreBtn = document.createElement('button');
-  restoreBtn.className = 'icon-btn restore';
-  restoreBtn.innerHTML = '↩️';
-  restoreBtn.title = '復元';
-  restoreBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    confirmAction('このタスクを復元しますか？', () => {
-      restoreTask(task.id);
-      renderTasks();
-    });
-  });
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'icon-btn delete';
-  deleteBtn.innerHTML = '🗑️';
-  deleteBtn.title = '完全削除';
-  deleteBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    confirmAction('このタスクを完全に削除しますか？\nこの操作は取り消せません。', () => {
-      permanentDelete(task.id);
-      renderTasks();
-    });
-  });
-
-  actions.appendChild(restoreBtn);
-  actions.appendChild(deleteBtn);
-  div.appendChild(actions);
 
   return div;
 }
