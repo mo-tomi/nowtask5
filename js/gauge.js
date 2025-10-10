@@ -261,14 +261,11 @@ function updateScheduledTasks(dateArg) {
   // 変更点の説明（日本語コメント）:
   // - 期限なしタスクはゲージに含めない（今日が期限のタスクのみ対象）
   // - 完了済みタスクはゲージに含めない
-  // - デイリールーティンタスクはゲージに含めない
+  // - デイリールーティンタスクも含める（期限が今日の日付に設定されている）
   // そのため、ここでは "dueDate が存在し、かつ baseDate の範囲内" のタスクのみを抽出する
   const todayTasks = tasks.filter(task => {
     // 完了済みは除外
     if (task.isCompleted) return false;
-
-    // デイリールーティンタスクは除外
-    if (task.isRoutine) return false;
 
     // 期限がある場合のみ、今日の範囲内かチェック
     if (task.dueDate) {
@@ -283,7 +280,6 @@ function updateScheduledTasks(dateArg) {
   // 前日が期限で、日をまたぐタスクを抽出（翌日分として当日に加算）
   const yesterdayTasks = tasks.filter(task => {
     if (task.isCompleted) return false;
-    if (task.isRoutine) return false; // デイリールーティンタスクは除外
     if (task.dueDate) {
       const dueDate = new Date(task.dueDate);
       return dueDate >= yesterday && dueDate < baseDate;
