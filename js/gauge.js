@@ -413,6 +413,14 @@ function updateScheduledTasks(dateArg) {
     blockEl.dataset.startTime = block.task.startTime;
     blockEl.dataset.endTime = block.task.endTime;
 
+    // 時刻ラベルを追加
+    const startHour = Math.floor(block.startMinutes / 60);
+    const startMin = block.startMinutes % 60;
+    const endHour = Math.floor(block.endMinutes / 60);
+    const endMin = block.endMinutes % 60;
+    const timeLabel = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}-${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    blockEl.dataset.timeLabel = timeLabel;
+
     // クリックイベント
     blockEl.addEventListener('click', (e) => {
       e.stopPropagation();
