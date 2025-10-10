@@ -486,9 +486,7 @@ function updateScheduledTasks(dateArg) {
     }
 
     // 時間オーバー警告を表示（今日の日付の場合のみ）
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (formatDateISO(baseDate) === formatDateISO(today) && typeof openTimeOverloadModal === 'function') {
+    if (isToday && typeof openTimeOverloadModal === 'function') {
       // 警告モーダルを表示（1回だけ）
       if (!window.overloadModalShown) {
         window.overloadModalShown = true;
@@ -512,9 +510,7 @@ function updateScheduledTasks(dateArg) {
   }
 
   // 空き時間を記録（今日の日付の場合のみ）
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (formatDateISO(baseDate) === formatDateISO(today) && typeof recordDailyFreeTime === 'function') {
+  if (isToday && typeof recordDailyFreeTime === 'function') {
     recordDailyFreeTime(freeTimeMinutes);
   }
 }
