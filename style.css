@@ -1691,9 +1691,38 @@ body {
     margin-bottom: 8px;
   }
 
+  .time-gauge-container {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .time-gauge-header {
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .gauge-nav-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .gauge-header-center {
+    gap: 6px;
+  }
+
+  .current-time {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
   .remaining-tasks {
-    font-size: 12px;
-    padding: 3px 10px;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 18px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
   }
 
   .time-gauge {
