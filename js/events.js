@@ -3,30 +3,11 @@
 // ========================================
 
 function initEventListeners() {
-  // アプリタイトルクリックでタスク一覧に戻る
-  document.getElementById('app-title-btn').addEventListener('click', () => {
-    showTasks();
+
+  // X共有アイコン
+  document.getElementById('share-icon-btn').addEventListener('click', () => {
+    generateAndShareImage();
   });
-
-  // ゴミ箱アイコン（タブUIを廃止したため、直接表示切替を行う）
-  document.getElementById('trash-icon-btn').addEventListener('click', () => {
-    showTrash();
-  });
-
-  // 設定アイコン
-  function showTasks() {
-    document.getElementById('tasks-tab').classList.add('active');
-    document.getElementById('trash-tab').classList.remove('active');
-    const fab = document.getElementById('create-task-btn');
-    if (fab) fab.style.display = 'flex';
-  }
-
-  function showTrash() {
-    document.getElementById('tasks-tab').classList.remove('active');
-    document.getElementById('trash-tab').classList.add('active');
-    const fab = document.getElementById('create-task-btn');
-    if (fab) fab.style.display = 'none';
-  }
 
   // 設定アイコン
   document.getElementById('settings-icon-btn').addEventListener('click', () => {
@@ -219,6 +200,13 @@ function initEventListeners() {
       let dueDate = null;
       if (quickDateInput.value) {
         dueDate = new Date(quickDateInput.value + 'T00:00:00').toISOString();
+      } else {
+        // 日付未指定の場合は今日の日付を設定
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        dueDate = new Date(`${year}-${month}-${day}T00:00:00`).toISOString();
       }
 
       // 新規タスク作成
@@ -288,11 +276,19 @@ function initEventListeners() {
         // タスクを即座に作成
         const tasks = getTasks();
         const now = new Date().toISOString();
+
+        // 今日の日付を設定
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayDate = new Date(`${year}-${month}-${day}T00:00:00`).toISOString();
+
         const task = {
           id: generateUUID(),
           title: itemTitle,
           memo: '',
-          dueDate: null,
+          dueDate: todayDate,
           isCompleted: false,
           createdAt: now,
           updatedAt: now,

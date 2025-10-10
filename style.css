@@ -54,9 +54,8 @@ body {
   gap: 8px;
 }
 
-.trash-icon-btn,
-.shelf-icon-btn,
-.settings-icon-btn {
+.settings-icon-btn,
+.share-icon-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;
@@ -70,16 +69,14 @@ body {
   transition: all 0.2s ease;
 }
 
-.trash-icon-btn:hover,
-.shelf-icon-btn:hover,
-.settings-icon-btn:hover {
+.settings-icon-btn:hover,
+.share-icon-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
-.trash-icon-btn:active,
-.shelf-icon-btn:active,
-.settings-icon-btn:active {
+.settings-icon-btn:active,
+.share-icon-btn:active {
   transform: scale(0.95);
 }
 
