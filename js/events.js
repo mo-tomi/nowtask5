@@ -8,11 +8,6 @@ function initEventListeners() {
     showTasks();
   });
 
-  // 棚上げアイコン
-  document.getElementById('shelf-icon-btn').addEventListener('click', () => {
-    showShelf();
-  });
-
   // ゴミ箱アイコン（タブUIを廃止したため、直接表示切替を行う）
   document.getElementById('trash-icon-btn').addEventListener('click', () => {
     showTrash();
@@ -21,23 +16,13 @@ function initEventListeners() {
   // 設定アイコン
   function showTasks() {
     document.getElementById('tasks-tab').classList.add('active');
-    document.getElementById('shelf-tab').classList.remove('active');
     document.getElementById('trash-tab').classList.remove('active');
     const fab = document.getElementById('create-task-btn');
     if (fab) fab.style.display = 'flex';
   }
 
-  function showShelf() {
-    document.getElementById('tasks-tab').classList.remove('active');
-    document.getElementById('shelf-tab').classList.add('active');
-    document.getElementById('trash-tab').classList.remove('active');
-    const fab = document.getElementById('create-task-btn');
-    if (fab) fab.style.display = 'none';
-  }
-
   function showTrash() {
     document.getElementById('tasks-tab').classList.remove('active');
-    document.getElementById('shelf-tab').classList.remove('active');
     document.getElementById('trash-tab').classList.add('active');
     const fab = document.getElementById('create-task-btn');
     if (fab) fab.style.display = 'none';

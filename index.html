@@ -15,9 +15,9 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="description" content="モノクロデザインのシンプルなタスク管理アプリ">
 
-  <link rel="stylesheet" href="css/style-base.css?v=21">
-  <link rel="stylesheet" href="css/style-components.css?v=21">
-  <link rel="stylesheet" href="style.css?v=21">
+  <link rel="stylesheet" href="css/style-base.css?v=22">
+  <link rel="stylesheet" href="css/style-components.css?v=22">
+  <link rel="stylesheet" href="style.css?v=22">
 </head>
 <body>
   <!-- ヘッダー -->
@@ -26,12 +26,9 @@
       <h1 class="app-title" id="app-title-btn" style="cursor: pointer;">nowtask</h1>
       <div class="header-actions">
         <button class="settings-icon-btn" id="settings-icon-btn" aria-label="設定" title="設定">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 1v6m0 6v6"></path>
-            <path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path>
-            <path d="M1 12h6m6 0h6"></path>
-            <path d="m4.93 19.07 4.24-4.24m5.66-5.66 4.24-4.24"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </button>
         <button class="analytics-icon-btn" id="analytics-icon-btn" aria-label="分析" title="分析">
@@ -39,13 +36,6 @@
             <rect x="3" y="13" width="4" height="8"></rect>
             <rect x="10" y="8" width="4" height="13"></rect>
             <rect x="17" y="3" width="4" height="18"></rect>
-          </svg>
-        </button>
-        <button class="shelf-icon-btn" id="shelf-icon-btn" aria-label="棚上げ" title="棚上げ">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-            <line x1="2" y1="10" x2="22" y2="10"></line>
-            <line x1="2" y1="16" x2="22" y2="16"></line>
           </svg>
         </button>
         <button class="trash-icon-btn" id="trash-icon-btn" aria-label="ゴミ箱" title="ゴミ箱">
@@ -215,20 +205,6 @@
         <div class="completed-content" id="completed-content">
           <div id="completed-list" class="task-list"></div>
         </div>
-      </div>
-    </div>
-
-    <!-- 棚上げリスト -->
-    <div class="tab-content" id="shelf-tab">
-      <div id="shelf-list" class="task-list"></div>
-      <div class="empty-state" id="shelf-empty">
-        <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="#d0d0d0" stroke-width="2" style="margin: 0 auto 24px;">
-          <rect x="20" y="25" width="60" height="50" rx="4"></rect>
-          <line x1="20" y1="40" x2="80" y2="40"></line>
-          <line x1="20" y1="55" x2="80" y2="55"></line>
-        </svg>
-        <p style="font-size: 18px; font-weight: 500; margin-bottom: 12px; color: #9e9e9e;">棚上げタスクはありません</p>
-        <small style="font-size: 14px; color: #bdbdbd;">「今はできないけど、いつかやりたい」タスクを保管できます</small>
       </div>
     </div>
 
@@ -435,15 +411,15 @@
     </div>
   </div>
 
-  <script src="js/core.js?v=21"></script>
+  <script src="js/core.js?v=22"></script>
   <script src="js/tasks.js?v=23"></script>
-  <script src="js/render.js?v=21"></script>
-  <script src="js/modals.js?v=21"></script>
+  <script src="js/render.js?v=22"></script>
+  <script src="js/modals.js?v=22"></script>
   <script src="js/gauge.js?v=24"></script>
-  <script src="js/analytics.js?v=21"></script>
-  <script src="js/overload.js?v=21"></script>
-  <script src="js/events.js?v=21"></script>
-  <script src="js/ui-main.js?v=21"></script>
+  <script src="js/analytics.js?v=22"></script>
+  <script src="js/overload.js?v=22"></script>
+  <script src="js/events.js?v=22"></script>
+  <script src="js/ui-main.js?v=22"></script>
 
   <!-- Service Worker登録 -->
   <script>

@@ -189,8 +189,11 @@ function renderTasks() {
           const tomorrow = new Date();
           tomorrow.setDate(tomorrow.getDate() + 1);
           const tomorrowISO = formatDateISO(tomorrow);
-          openTaskModal();
-          document.getElementById('task-due-date').value = tomorrowISO;
+          openCreateModal();
+          // モーダルが開いた後に日付を設定
+          setTimeout(() => {
+            document.getElementById('task-due-date').value = tomorrowISO;
+          }, 0);
         });
         tasksList.appendChild(addTomorrowBtn);
       }
@@ -218,21 +221,6 @@ function renderTasks() {
 
     completedTasks.forEach(task => {
       renderTaskWithSubtasks(task, completedList, true);
-    });
-  }
-
-  // 棚上げタブ
-  const shelved = loadFromStorage(STORAGE_KEYS.SHELVED, []);
-  const shelfList = document.getElementById('shelf-list');
-  const shelfEmpty = document.getElementById('shelf-empty');
-  shelfList.innerHTML = '';
-
-  if (shelved.length === 0) {
-    shelfEmpty.classList.add('show');
-  } else {
-    shelfEmpty.classList.remove('show');
-    shelved.forEach(task => {
-      shelfList.appendChild(createShelfElement(task));
     });
   }
 
@@ -547,56 +535,6 @@ function createTaskElement(task, level = 0) {
   return div;
 }
 
-// 棚上げ要素作成
-function createShelfElement(task) {
-  const div = document.createElement('div');
-  div.className = 'task-item';
-  div.dataset.id = task.id;
-
-  const content = document.createElement('div');
-  content.className = 'task-content';
-
-  const title = document.createElement('div');
-  title.className = 'task-title';
-  title.textContent = task.title;
-  content.appendChild(title);
-
-  const meta = document.createElement('div');
-  meta.className = 'task-meta';
-  meta.textContent = '棚上げ日: ' + formatDateTime(task.shelvedAt);
-  content.appendChild(meta);
-
-  if (task.memo) {
-    const memo = document.createElement('div');
-    memo.className = 'task-memo';
-    memo.textContent = task.memo.substring(0, 100) + (task.memo.length > 100 ? '...' : '');
-    content.appendChild(memo);
-  }
-
-  div.appendChild(content);
-
-  // アクション部分
-  const actions = document.createElement('div');
-  actions.className = 'task-actions';
-
-  const restoreBtn = document.createElement('button');
-  restoreBtn.className = 'icon-btn restore';
-  restoreBtn.innerHTML = '↩️';
-  restoreBtn.title = '復帰';
-  restoreBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    confirmAction('このタスクを復帰させますか？', () => {
-      unshelveTask(task.id);
-      renderTasks();
-    });
-  });
-
-  actions.appendChild(restoreBtn);
-  div.appendChild(actions);
-
-  return div;
-}
-
 // ゴミ箱要素作成
 function createTrashElement(task) {
   const div = document.createElement('div');
@@ -901,19 +839,6 @@ function showTaskMenu(event, task) {
     menu.remove();
   });
   menu.appendChild(editItem);
-
-  // 棚上げボタン
-  const shelfItem = document.createElement('div');
-  shelfItem.className = 'menu-item';
-  shelfItem.textContent = '📦 棚上げ';
-  shelfItem.addEventListener('click', () => {
-    confirmAction('このタスクを棚上げしますか？', () => {
-      shelveTask(task.id);
-      renderTasks();
-    });
-    menu.remove();
-  });
-  menu.appendChild(shelfItem);
 
   // メニューの位置を設定
   const rect = event.target.getBoundingClientRect();
