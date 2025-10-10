@@ -310,19 +310,30 @@ function updateScheduledTasks(dateArg) {
       const startMinutes = startHour * 60 + startMin;
       let endMinutes = endHour * 60 + endMin;
 
-      // 日をまたぐ場合
+      // 日をまたぐ場合の処理
       if (endMinutes < startMinutes) {
-        endMinutes = 24 * 60;
-      }
+        // タスクが日をまたぐ場合、当日分（開始時刻から24:00まで）のみを計算
+        const todayPortion = (24 * 60) - startMinutes;
 
-      // 現在時刻より後のタスクのみカウント
-      if (endMinutes > currentMinutes) {
+        // 現在時刻より後のタスクのみカウント
         if (startMinutes >= currentMinutes) {
-          // まだ始まっていないタスク: 全時間をカウント
-          totalDurationMinutes += endMinutes - startMinutes;
-        } else {
-          // 現在進行中のタスク: 残り時間のみカウント
-          totalDurationMinutes += endMinutes - currentMinutes;
+          // まだ始まっていないタスク: 当日分の全時間をカウント
+          totalDurationMinutes += todayPortion;
+        } else if ((24 * 60) > currentMinutes) {
+          // 現在進行中のタスク: 残り時間のみカウント（24:00まで）
+          totalDurationMinutes += (24 * 60) - currentMinutes;
+        }
+      } else {
+        // 日をまたがない通常のタスク
+        // 現在時刻より後のタスクのみカウント
+        if (endMinutes > currentMinutes) {
+          if (startMinutes >= currentMinutes) {
+            // まだ始まっていないタスク: 全時間をカウント
+            totalDurationMinutes += endMinutes - startMinutes;
+          } else {
+            // 現在進行中のタスク: 残り時間のみカウント
+            totalDurationMinutes += endMinutes - currentMinutes;
+          }
         }
       }
       // 既に終わったタスク（endMinutes <= currentMinutes）はカウントしない
