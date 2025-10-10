@@ -2251,3 +2251,196 @@ body {
     padding: 12px;
   }
 }
+
+/* ========================================
+   時間オーバー警告モーダル
+   ======================================== */
+.overload-warning {
+  background: #f5f5f5;
+  border-left: 4px solid #000000;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.overload-message {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.overload-message strong {
+  color: #000000;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.overload-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.overload-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.overload-tasks-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overload-tasks-list::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.overload-tasks-list::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 4px;
+}
+
+.overload-tasks-list::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+.overload-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.overload-task-item:hover {
+  background: #f9f9f9;
+  border-color: #cccccc;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.overload-task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.overload-task-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.overload-task-time {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.overload-task-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-edit-task,
+.btn-postpone-task,
+.btn-delete-task {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-edit-task:hover {
+  background: #e0e0e0;
+  border-color: #cccccc;
+  color: #000000;
+  transform: scale(1.05);
+}
+
+.btn-postpone-task:hover {
+  background: #e0e0e0;
+  border-color: #cccccc;
+  color: #000000;
+  transform: scale(1.05);
+}
+
+.btn-delete-task:hover {
+  background: #ffebee;
+  border-color: #ef9a9a;
+  color: #d32f2f;
+  transform: scale(1.05);
+}
+
+.btn-edit-task:active,
+.btn-postpone-task:active,
+.btn-delete-task:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 600px) {
+  .overload-warning {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .overload-message {
+    font-size: 15px;
+  }
+
+  .overload-message strong {
+    font-size: 17px;
+  }
+
+  .overload-description {
+    font-size: 13px;
+  }
+
+  .overload-task-item {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .overload-task-title {
+    font-size: 14px;
+  }
+
+  .overload-task-time {
+    font-size: 12px;
+  }
+
+  .btn-edit-task,
+  .btn-postpone-task,
+  .btn-delete-task {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-edit-task svg,
+  .btn-postpone-task svg,
+  .btn-delete-task svg {
+    width: 14px;
+    height: 14px;
+  }
+}

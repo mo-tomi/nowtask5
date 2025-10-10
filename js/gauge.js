@@ -479,6 +479,19 @@ function updateScheduledTasks(dateArg) {
     } else {
       remainingElement.textContent = `時間オーバー: ${overMins}分`;
     }
+
+    // 時間オーバー警告を表示（今日の日付の場合のみ）
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (formatDateISO(baseDate) === formatDateISO(today) && typeof openTimeOverloadModal === 'function') {
+      // 警告モーダルを表示（1回だけ）
+      if (!window.overloadModalShown) {
+        window.overloadModalShown = true;
+        setTimeout(() => {
+          openTimeOverloadModal(freeTimeMinutes, todayTasks);
+        }, 500);
+      }
+    }
   } else {
     // 空き時間を表示
     const hours = Math.floor(freeTimeMinutes / 60);

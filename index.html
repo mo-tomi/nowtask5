@@ -404,12 +404,42 @@
     </div>
   </div>
 
+  <!-- 時間オーバー警告モーダル -->
+  <div class="modal" id="time-overload-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚠️ 時間オーバー警告</h2>
+        <button class="close-btn" id="close-overload-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="overload-warning">
+          <p class="overload-message">
+            今日のタスクが時間内に収まりません。<br>
+            <strong id="overload-amount"></strong>分オーバーしています。
+          </p>
+          <p class="overload-description">
+            以下のタスクの時間を調整するか、一部を別の日に移動することをおすすめします。
+          </p>
+        </div>
+
+        <div id="overload-tasks-list" class="overload-tasks-list">
+          <!-- タスクリストが動的に生成される -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="overload-cancel-btn">閉じる</button>
+        <button class="btn btn-primary" id="overload-adjust-btn">タスクを調整する</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/core.js?v=19"></script>
   <script src="js/tasks.js?v=19"></script>
   <script src="js/render.js?v=19"></script>
   <script src="js/modals.js?v=19"></script>
   <script src="js/gauge.js?v=19"></script>
   <script src="js/analytics.js?v=19"></script>
+  <script src="js/overload.js?v=19"></script>
   <script src="js/events.js?v=19"></script>
   <script src="js/ui-main.js?v=19"></script>
 

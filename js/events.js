@@ -394,6 +394,47 @@ function initEventListeners() {
     addSubtask();
   });
 
+  // 時間オーバー警告モーダルのイベント
+  const closeOverloadBtn = document.getElementById('close-overload-btn');
+  const overloadCancelBtn = document.getElementById('overload-cancel-btn');
+  const overloadAdjustBtn = document.getElementById('overload-adjust-btn');
+  const timeOverloadModal = document.getElementById('time-overload-modal');
+
+  if (closeOverloadBtn) {
+    closeOverloadBtn.addEventListener('click', () => {
+      if (typeof closeTimeOverloadModal === 'function') {
+        closeTimeOverloadModal();
+      }
+    });
+  }
+
+  if (overloadCancelBtn) {
+    overloadCancelBtn.addEventListener('click', () => {
+      if (typeof closeTimeOverloadModal === 'function') {
+        closeTimeOverloadModal();
+      }
+    });
+  }
+
+  if (overloadAdjustBtn) {
+    overloadAdjustBtn.addEventListener('click', () => {
+      // 調整ボタンは現在モーダルを閉じるだけ（タスク一覧で個別に調整）
+      if (typeof closeTimeOverloadModal === 'function') {
+        closeTimeOverloadModal();
+      }
+    });
+  }
+
+  if (timeOverloadModal) {
+    timeOverloadModal.addEventListener('click', (e) => {
+      if (e.target.id === 'time-overload-modal') {
+        if (typeof closeTimeOverloadModal === 'function') {
+          closeTimeOverloadModal();
+        }
+      }
+    });
+  }
+
   // スクロール連動で24時間ゲージを更新（スロットリング）
   const tasksListContainer = document.querySelector('.main-content');
   if (tasksListContainer) {
