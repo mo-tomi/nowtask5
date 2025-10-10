@@ -2725,47 +2725,60 @@ body {
 
 @media (max-width: 600px) {
   .calendar-grid {
-    gap: 2px;
+    gap: 1px;
   }
 
   .calendar-day {
-    padding: 2px;
-    border-radius: 4px;
+    padding: 1px;
+    border-radius: 2px;
+    border-width: 0.5px;
   }
 
   .calendar-day-number {
-    font-size: 12px;
-    margin-bottom: 2px;
-  }
-
-  .calendar-task-count {
-    font-size: 9px;
+    font-size: 10px;
     margin-bottom: 1px;
   }
 
-  .calendar-task-status {
+  .calendar-task-count {
     font-size: 8px;
-    gap: 2px;
+    margin-bottom: 0px;
+  }
+
+  .calendar-task-status {
+    font-size: 7px;
+    gap: 1px;
   }
 
   .incomplete-dot,
   .complete-dot {
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
   }
 
   .calendar-weekday {
-    font-size: 10px;
-    padding: 4px 0;
+    font-size: 9px;
+    padding: 2px 0;
+  }
+
+  .calendar-nav {
+    margin-bottom: 12px;
   }
 
   .calendar-nav-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
   }
 
   .calendar-current-month {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  #calendar-modal .modal-body {
+    padding: 12px;
+  }
+
+  #calendar-modal .modal-header {
+    padding: 12px;
   }
 }
