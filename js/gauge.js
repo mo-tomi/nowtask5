@@ -457,30 +457,27 @@ function updateScheduledTasks(dateArg) {
 
   // 密度レベルを判定
   let densityLevel = 'green';
-  let densityEmoji = '🟢';
 
   if (densityPercent >= 100) {
     densityLevel = 'red';
-    densityEmoji = '🔴';
   } else if (densityPercent >= 70) {
     densityLevel = 'yellow';
-    densityEmoji = '🟡';
   }
 
   // ゲージコンテナに密度クラスを設定
   gaugeContainer.classList.remove('density-green', 'density-yellow', 'density-red');
   gaugeContainer.classList.add(`density-${densityLevel}`);
 
-  // 【修正】分かりやすい表示
+  // 【修正】分かりやすい表示（絵文字なし・モノクロ）
   if (freeTimeMinutes < 0) {
     // タスクが多すぎる場合
     const overMinutes = Math.abs(freeTimeMinutes);
     const overHours = Math.floor(overMinutes / 60);
     const overMins = overMinutes % 60;
     if (overHours > 0) {
-      remainingElement.textContent = `${densityEmoji} 時間オーバー: ${overHours}時間${overMins > 0 ? overMins + '分' : ''}`;
+      remainingElement.textContent = `時間オーバー: ${overHours}時間${overMins > 0 ? overMins + '分' : ''}`;
     } else {
-      remainingElement.textContent = `${densityEmoji} 時間オーバー: ${overMins}分`;
+      remainingElement.textContent = `時間オーバー: ${overMins}分`;
     }
   } else {
     // 空き時間を表示
@@ -488,11 +485,11 @@ function updateScheduledTasks(dateArg) {
     const minutes = freeTimeMinutes % 60;
 
     if (hours > 0) {
-      remainingElement.textContent = `${densityEmoji} 空き時間: ${hours}時間${minutes > 0 ? minutes + '分' : ''}`;
+      remainingElement.textContent = `空き時間: ${hours}時間${minutes > 0 ? minutes + '分' : ''}`;
     } else if (minutes > 0) {
-      remainingElement.textContent = `${densityEmoji} 空き時間: ${minutes}分`;
+      remainingElement.textContent = `空き時間: ${minutes}分`;
     } else {
-      remainingElement.textContent = `${densityEmoji} ぴったり（余裕なし）`;
+      remainingElement.textContent = `ぴったり（余裕なし）`;
     }
   }
 
