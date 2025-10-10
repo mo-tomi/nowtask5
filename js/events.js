@@ -169,15 +169,17 @@ function initEventListeners() {
   const quickHistoryTags = document.getElementById('quick-history-tags');
 
   // カレンダーボタンのクリック
-  quickDateBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (quickDatetimePanel.style.display === 'none') {
-      quickDatetimePanel.style.display = 'block';
-    } else {
-      quickDatetimePanel.style.display = 'none';
-    }
-  });
+  if (quickDateBtn) {
+    quickDateBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (quickDatetimePanel.style.display === 'none') {
+        quickDatetimePanel.style.display = 'block';
+      } else {
+        quickDatetimePanel.style.display = 'none';
+      }
+    });
+  }
 
   // 日時パネルを閉じる
   if (quickDatetimeClose) {
@@ -188,22 +190,25 @@ function initEventListeners() {
   }
 
   // 日時選択時
-  quickDateInput.addEventListener('change', () => {
-    if (quickDateInput.value) {
-      quickDateBtn.classList.add('has-date');
-    } else {
-      quickDateBtn.classList.remove('has-date');
-    }
-  });
+  if (quickDateInput) {
+    quickDateInput.addEventListener('change', () => {
+      if (quickDateInput.value) {
+        quickDateBtn.classList.add('has-date');
+      } else {
+        quickDateBtn.classList.remove('has-date');
+      }
+    });
+  }
 
   // パネルの外側クリックで閉じる
   document.addEventListener('click', (e) => {
-    if (quickDatetimePanel && !quickDatetimePanel.contains(e.target) && !quickDateBtn.contains(e.target)) {
+    if (quickDatetimePanel && !quickDatetimePanel.contains(e.target) && quickDateBtn && !quickDateBtn.contains(e.target)) {
       quickDatetimePanel.style.display = 'none';
     }
   });
 
-  quickAddForm.addEventListener('submit', (e) => {
+  if (quickAddForm) {
+    quickAddForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (quickInput.value.trim()) {
       const title = quickInput.value.trim();
@@ -258,7 +263,8 @@ function initEventListeners() {
       quickDateBtn.classList.remove('has-date');
       renderTasks();
     }
-  });
+    });
+  }
 
   // ---- 履歴タグの初期化とイベント ----
   function renderHistoryTags() {
@@ -425,6 +431,9 @@ function initEventListeners() {
   if (tasksListContainer) {
     let lastCall = 0;
     const throttleMs = 150;
+    let scrollTimeout = null;
+    let isScrolling = false;
+
     tasksListContainer.addEventListener('scroll', () => {
       const now = Date.now();
       if (now - lastCall < throttleMs) return;
@@ -448,32 +457,26 @@ function initEventListeners() {
       if (topMostDate !== null) {
         updateTimeGauge(topMostDate || undefined);
       }
-    });
-  }
 
-  // クイック入力のスクロール時の表示/非表示制御
-  const quickAddForm = document.getElementById('quick-add-form');
-  if (quickAddForm && tasksListContainer) {
-    let scrollTimeout = null;
-    let isScrolling = false;
+      // クイック入力のスクロール時の表示/非表示制御
+      if (quickAddForm) {
+        // スクロール中はクイック入力を非表示
+        if (!isScrolling) {
+          isScrolling = true;
+          quickAddForm.classList.add('hidden');
+        }
 
-    tasksListContainer.addEventListener('scroll', () => {
-      // スクロール中はクイック入力を非表示
-      if (!isScrolling) {
-        isScrolling = true;
-        quickAddForm.classList.add('hidden');
+        // 既存のタイムアウトをクリア
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+
+        // スクロール停止後3秒で再表示
+        scrollTimeout = setTimeout(() => {
+          isScrolling = false;
+          quickAddForm.classList.remove('hidden');
+        }, 3000);
       }
-
-      // 既存のタイムアウトをクリア
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
-
-      // スクロール停止後3秒で再表示
-      scrollTimeout = setTimeout(() => {
-        isScrolling = false;
-        quickAddForm.classList.remove('hidden');
-      }, 3000);
     });
   }
 }
