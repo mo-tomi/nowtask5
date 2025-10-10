@@ -152,11 +152,12 @@ body {
   display: flex;
   gap: 4px;
   align-items: center;
+  z-index: 10;
 }
 
 .quick-action-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: #666666;
+  border: 1px solid #555555;
   border-radius: 4px;
   width: 32px;
   height: 32px;
@@ -167,10 +168,11 @@ body {
   color: white;
   transition: all 0.2s ease;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .quick-action-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #555555;
   transform: scale(1.05);
 }
 
