@@ -26,6 +26,9 @@ function openCreateModal() {
   document.getElementById('subtasks-section').style.display = 'none';
   document.getElementById('save-btn').disabled = true;
 
+  // 時間フィールドの自動計算イベントを設定
+  setupTimeAutoCalculation();
+
   document.getElementById('task-modal').classList.add('show');
   document.getElementById('task-title').focus();
 }
@@ -78,6 +81,9 @@ function openEditModal(id) {
       updateTimerDisplay(editingTaskId);
     }
   }, 1000);
+
+  // 時間フィールドの自動計算イベントを設定
+  setupTimeAutoCalculation();
 
   document.getElementById('task-modal').classList.add('show');
   document.getElementById('task-title').focus();
@@ -315,6 +321,57 @@ function confirmAction(message, callback) {
 
   okBtn.addEventListener('click', handleOk);
   cancelBtn.addEventListener('click', handleCancel);
+}
+
+// ========================================
+// 時間フィールドの自動計算
+// ========================================
+
+// 開始時刻と所要時間から終了時刻を自動計算
+function setupTimeAutoCalculation() {
+  const startTimeInput = document.getElementById('task-start-time');
+  const durationInput = document.getElementById('task-duration');
+  const endTimeInput = document.getElementById('task-end-time');
+
+  // イベントリスナーを削除してから再設定（重複防止）
+  const newStartTimeInput = startTimeInput.cloneNode(true);
+  const newDurationInput = durationInput.cloneNode(true);
+  startTimeInput.parentNode.replaceChild(newStartTimeInput, startTimeInput);
+  durationInput.parentNode.replaceChild(newDurationInput, durationInput);
+
+  const calculateEndTime = () => {
+    const startTime = document.getElementById('task-start-time').value;
+    const duration = document.getElementById('task-duration').value;
+    const endTime = document.getElementById('task-end-time').value;
+
+    // 開始時刻と所要時間が入力されていて、終了時刻が未入力の場合
+    if (startTime && duration && !endTime) {
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const durationMinutes = parseInt(duration);
+
+      // 開始時刻（分単位）
+      const startTotalMinutes = startHour * 60 + startMin;
+      // 終了時刻（分単位）
+      let endTotalMinutes = startTotalMinutes + durationMinutes;
+
+      // 24時間を超える場合は24時間以内に収める（翌日への繰越）
+      if (endTotalMinutes >= 24 * 60) {
+        endTotalMinutes = endTotalMinutes % (24 * 60);
+      }
+
+      const endHour = Math.floor(endTotalMinutes / 60);
+      const endMin = endTotalMinutes % 60;
+
+      // 終了時刻を設定
+      document.getElementById('task-end-time').value =
+        `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    }
+  };
+
+  // 開始時刻が変更されたとき
+  document.getElementById('task-start-time').addEventListener('input', calculateEndTime);
+  // 所要時間が変更されたとき
+  document.getElementById('task-duration').addEventListener('change', calculateEndTime);
 }
 
 // ========================================
