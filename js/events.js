@@ -51,6 +51,56 @@ function initEventListeners() {
     });
   }
 
+  // テンプレート選択ボタン
+  const templateSelectBtn = document.getElementById('template-select-btn');
+  if (templateSelectBtn) {
+    templateSelectBtn.addEventListener('click', () => {
+      if (typeof openTemplateModal === 'function') {
+        openTemplateModal();
+      }
+    });
+  }
+
+  // テンプレートモーダルを閉じる
+  const closeTemplateBtn = document.getElementById('close-template-btn');
+  const templateCloseBtn = document.getElementById('template-close-btn');
+  if (closeTemplateBtn) {
+    closeTemplateBtn.addEventListener('click', () => {
+      if (typeof closeTemplateModal === 'function') {
+        closeTemplateModal();
+      }
+    });
+  }
+  if (templateCloseBtn) {
+    templateCloseBtn.addEventListener('click', () => {
+      if (typeof closeTemplateModal === 'function') {
+        closeTemplateModal();
+      }
+    });
+  }
+
+  // テンプレートモーダル外クリックで閉じる
+  const templateModal = document.getElementById('template-modal');
+  if (templateModal) {
+    templateModal.addEventListener('click', (e) => {
+      if (e.target.id === 'template-modal') {
+        if (typeof closeTemplateModal === 'function') {
+          closeTemplateModal();
+        }
+      }
+    });
+  }
+
+  // テンプレート保存ボタン
+  const addTemplateBtn = document.getElementById('add-template-btn');
+  if (addTemplateBtn) {
+    addTemplateBtn.addEventListener('click', () => {
+      if (typeof saveCurrentAsTemplate === 'function') {
+        saveCurrentAsTemplate();
+      }
+    });
+  }
+
   // カレンダーアイコン
   const calendarIconBtn = document.getElementById('calendar-icon-btn');
   if (calendarIconBtn) {

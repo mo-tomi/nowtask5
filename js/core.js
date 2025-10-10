@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
   SETTINGS: 'nowtask_settings',
   ROUTINES: 'nowtask_routines'
   // 履歴用キー（最新20件を保存）
-  ,TASK_HISTORY: 'nowtask_task_history'
+  ,TASK_HISTORY: 'nowtask_task_history',
+  TEMPLATES: 'nowtask_templates'
 };
 
 const TRASH_RETENTION_DAYS = 30;

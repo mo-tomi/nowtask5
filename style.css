@@ -2590,6 +2590,134 @@ body {
 }
 
 /* ========================================
+   テンプレートモーダル
+   ======================================== */
+.templates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.template-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.template-item:hover {
+  background: #e0e0e0;
+  transform: translateX(4px);
+}
+
+.template-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.template-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  word-wrap: break-word;
+}
+
+.template-details {
+  font-size: 13px;
+  color: #666;
+}
+
+.template-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.template-use-btn {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #000000;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.template-use-btn:hover {
+  background: #000000;
+  border-color: #000000;
+  color: white;
+  transform: scale(1.1);
+}
+
+.template-use-btn:active {
+  transform: scale(0.95);
+}
+
+.template-delete-btn {
+  background: rgba(244, 67, 54, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #f44336;
+  font-size: 20px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.template-delete-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: scale(1.1);
+}
+
+.template-delete-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-add-template {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+}
+
+.btn-add-template:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-style: solid;
+}
+
+.btn-add-template:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
    カレンダーモーダル
    ======================================== */
 .calendar-nav {
