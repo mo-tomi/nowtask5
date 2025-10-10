@@ -238,7 +238,6 @@ function updateTimeGauge(dateArg) {
 // 今日の予定タスク時間を表示
 // dateArg: Date オブジェクトか ISO 日付文字列（YYYY-MM-DD）。未指定なら今日を対象。
 function updateScheduledTasks(dateArg) {
-  const tasks = getTasks();
   // baseDate を対象日の 0:00 に設定
   let baseDate = new Date();
   baseDate.setHours(0, 0, 0, 0);
@@ -251,6 +250,13 @@ function updateScheduledTasks(dateArg) {
       baseDate.setHours(0,0,0,0);
     }
   }
+
+  // 対象日のルーティンタスクを自動生成
+  if (typeof createDailyRoutineTasks === 'function') {
+    createDailyRoutineTasks(baseDate);
+  }
+
+  const tasks = getTasks();
 
   const tomorrow = new Date(baseDate);
   tomorrow.setDate(tomorrow.getDate() + 1);

@@ -416,8 +416,9 @@ function saveRoutines(routines) {
   return saveToStorage(STORAGE_KEYS.ROUTINES, routines);
 }
 
-// 今日のルーティンタスクを作成
-function createDailyRoutineTasks() {
+// 指定日のルーティンタスクを作成
+// targetDate: Date オブジェクト（省略時は今日）
+function createDailyRoutineTasks(targetDate) {
   const routines = getRoutines();
 
   // 配列でない場合（旧形式）はスキップ
@@ -427,30 +428,31 @@ function createDailyRoutineTasks() {
   }
 
   const tasks = getTasks();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const target = targetDate ? new Date(targetDate) : new Date();
+  target.setHours(0, 0, 0, 0);
 
   routines.forEach((routine, index) => {
     if (!routine || !routine.name || !routine.duration) return;
 
-    // 今日のこのルーティンタスクが既に存在するかチェック
-    const existsToday = tasks.some(task => {
+    // 対象日のこのルーティンタスクが既に存在するかチェック
+    const existsOnDate = tasks.some(task => {
       if (!task.isRoutine || task.routineId !== routine.id) return false;
-      const taskDate = new Date(task.createdAt);
-      taskDate.setHours(0, 0, 0, 0);
-      return taskDate.getTime() === today.getTime();
+      if (!task.dueDate) return false;
+      const taskDueDate = new Date(task.dueDate);
+      taskDueDate.setHours(0, 0, 0, 0);
+      return taskDueDate.getTime() === target.getTime();
     });
 
-    if (existsToday) return;
+    if (existsOnDate) return;
 
     // ルーティンタスクを作成
-    const todayISO = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString();
+    const targetISO = new Date(target.getTime() - target.getTimezoneOffset() * 60000).toISOString();
 
     const task = {
       id: generateUUID(),
       title: routine.name,
       memo: '',
-      dueDate: todayISO, // 今日の日付を自動設定
+      dueDate: targetISO, // 対象日の日付を自動設定
       isCompleted: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
