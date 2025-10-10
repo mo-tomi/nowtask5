@@ -33,6 +33,13 @@
             <path d="m4.93 19.07 4.24-4.24m5.66-5.66 4.24-4.24"></path>
           </svg>
         </button>
+        <button class="analytics-icon-btn" id="analytics-icon-btn" aria-label="分析" title="分析">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="13" width="4" height="8"></rect>
+            <rect x="10" y="8" width="4" height="13"></rect>
+            <rect x="17" y="3" width="4" height="18"></rect>
+          </svg>
+        </button>
         <button class="shelf-icon-btn" id="shelf-icon-btn" aria-label="棚上げ" title="棚上げ">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
@@ -349,11 +356,37 @@
     </div>
   </div>
 
+  <!-- 分析モーダル -->
+  <div class="modal" id="analytics-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 データ分析</h2>
+        <button class="close-btn" id="close-analytics-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- タスクランキング -->
+        <section class="analytics-section">
+          <h3 class="analytics-section-title">🏆 タスクランキング TOP5</h3>
+          <p class="analytics-description">完了したタスクの中で、最も時間をかけたタスクです</p>
+          <div id="task-ranking-list" class="ranking-list"></div>
+        </section>
+
+        <!-- 空き時間分析 -->
+        <section class="analytics-section">
+          <h3 class="analytics-section-title">⏰ 空き時間分析</h3>
+          <p class="analytics-description">毎日の空き時間を記録・分析しています</p>
+          <div id="free-time-stats" class="stats-grid"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
   <script src="js/core.js?v=19"></script>
   <script src="js/tasks.js?v=19"></script>
   <script src="js/render.js?v=19"></script>
   <script src="js/modals.js?v=19"></script>
   <script src="js/gauge.js?v=19"></script>
+  <script src="js/analytics.js?v=19"></script>
   <script src="js/events.js?v=19"></script>
   <script src="js/ui-main.js?v=19"></script>
 

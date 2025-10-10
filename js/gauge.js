@@ -495,4 +495,11 @@ function updateScheduledTasks(dateArg) {
       remainingElement.textContent = `${densityEmoji} ぴったり（余裕なし）`;
     }
   }
+
+  // 空き時間を記録（今日の日付の場合のみ）
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (formatDateISO(baseDate) === formatDateISO(today) && typeof recordDailyFreeTime === 'function') {
+    recordDailyFreeTime(freeTimeMinutes);
+  }
 }

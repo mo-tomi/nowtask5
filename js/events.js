@@ -53,6 +53,38 @@ function initEventListeners() {
     closeSettingsModal();
   });
 
+  // 分析アイコン
+  const analyticsIconBtn = document.getElementById('analytics-icon-btn');
+  if (analyticsIconBtn) {
+    analyticsIconBtn.addEventListener('click', () => {
+      if (typeof openAnalyticsModal === 'function') {
+        openAnalyticsModal();
+      }
+    });
+  }
+
+  // 分析モーダルを閉じる
+  const closeAnalyticsBtn = document.getElementById('close-analytics-btn');
+  if (closeAnalyticsBtn) {
+    closeAnalyticsBtn.addEventListener('click', () => {
+      if (typeof closeAnalyticsModal === 'function') {
+        closeAnalyticsModal();
+      }
+    });
+  }
+
+  // 分析モーダル外クリックで閉じる
+  const analyticsModal = document.getElementById('analytics-modal');
+  if (analyticsModal) {
+    analyticsModal.addEventListener('click', (e) => {
+      if (e.target.id === 'analytics-modal') {
+        if (typeof closeAnalyticsModal === 'function') {
+          closeAnalyticsModal();
+        }
+      }
+    });
+  }
+
   // 設定保存
   document.getElementById('save-settings-btn').addEventListener('click', () => {
     saveSettings();
