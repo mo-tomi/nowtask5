@@ -212,8 +212,18 @@
             <option value="300">5時間</option>
             <option value="330">5時間30分</option>
             <option value="360">6時間</option>
+            <option value="390">6時間30分</option>
             <option value="420">7時間</option>
+            <option value="450">7時間30分</option>
             <option value="480">8時間</option>
+            <option value="510">8時間30分</option>
+            <option value="540">9時間</option>
+            <option value="570">9時間30分</option>
+            <option value="600">10時間</option>
+            <option value="630">10時間30分</option>
+            <option value="660">11時間</option>
+            <option value="690">11時間30分</option>
+            <option value="720">12時間</option>
           </select>
         </div>
         <div class="form-group">
@@ -370,7 +380,61 @@
           <!-- テンプレートアイテムが動的に追加される -->
         </div>
 
-        <button type="button" class="btn-add-template" id="add-template-btn">+ 現在の入力内容をテンプレートとして保存</button>
+        <button type="button" class="btn-add-template" id="add-template-btn">+ 新規テンプレートを追加</button>
+
+        <!-- テンプレート入力フォーム（初期は非表示） -->
+        <div id="template-input-form" class="template-input-form" style="display: none;">
+          <div class="form-group">
+            <label for="template-name-input">タスク名 <span class="required">*</span></label>
+            <input type="text" id="template-name-input" maxlength="100" placeholder="タスク名を入力">
+          </div>
+          <div class="form-group">
+            <label for="template-memo-input">メモ</label>
+            <textarea id="template-memo-input" rows="3" placeholder="メモを入力（任意）"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="template-duration-input">所要時間</label>
+            <select id="template-duration-input">
+              <option value="">時間未設定</option>
+              <option value="30">30分</option>
+              <option value="60">1時間</option>
+              <option value="90">1時間30分</option>
+              <option value="120">2時間</option>
+              <option value="150">2時間30分</option>
+              <option value="180">3時間</option>
+              <option value="210">3時間30分</option>
+              <option value="240">4時間</option>
+              <option value="270">4時間30分</option>
+              <option value="300">5時間</option>
+              <option value="330">5時間30分</option>
+              <option value="360">6時間</option>
+              <option value="390">6時間30分</option>
+              <option value="420">7時間</option>
+              <option value="450">7時間30分</option>
+              <option value="480">8時間</option>
+              <option value="510">8時間30分</option>
+              <option value="540">9時間</option>
+              <option value="570">9時間30分</option>
+              <option value="600">10時間</option>
+              <option value="630">10時間30分</option>
+              <option value="660">11時間</option>
+              <option value="690">11時間30分</option>
+              <option value="720">12時間</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="template-start-time-input">開始時刻</label>
+            <input type="time" id="template-start-time-input">
+          </div>
+          <div class="form-group">
+            <label for="template-end-time-input">終了時刻</label>
+            <input type="time" id="template-end-time-input">
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <button type="button" class="btn btn-secondary" id="template-cancel-btn" style="flex: 1;">キャンセル</button>
+            <button type="button" class="btn btn-primary" id="template-save-btn" style="flex: 1;">保存</button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="template-close-btn">閉じる</button>
@@ -477,8 +541,18 @@
           <option value="300">5時間</option>
           <option value="330">5時間30分</option>
           <option value="360">6時間</option>
+          <option value="390">6時間30分</option>
           <option value="420">7時間</option>
+          <option value="450">7時間30分</option>
           <option value="480">8時間</option>
+          <option value="510">8時間30分</option>
+          <option value="540">9時間</option>
+          <option value="570">9時間30分</option>
+          <option value="600">10時間</option>
+          <option value="630">10時間30分</option>
+          <option value="660">11時間</option>
+          <option value="690">11時間30分</option>
+          <option value="720">12時間</option>
         </select>
       </div>
     </div>

@@ -95,12 +95,32 @@ function initEventListeners() {
     });
   }
 
-  // テンプレート保存ボタン
+  // テンプレート追加ボタン（フォーム表示）
   const addTemplateBtn = document.getElementById('add-template-btn');
   if (addTemplateBtn) {
     addTemplateBtn.addEventListener('click', () => {
-      if (typeof saveCurrentAsTemplate === 'function') {
-        saveCurrentAsTemplate();
+      if (typeof showTemplateInputForm === 'function') {
+        showTemplateInputForm();
+      }
+    });
+  }
+
+  // テンプレートフォーム保存ボタン
+  const templateSaveBtn = document.getElementById('template-save-btn');
+  if (templateSaveBtn) {
+    templateSaveBtn.addEventListener('click', () => {
+      if (typeof saveTemplateFromForm === 'function') {
+        saveTemplateFromForm();
+      }
+    });
+  }
+
+  // テンプレートフォームキャンセルボタン
+  const templateCancelBtn = document.getElementById('template-cancel-btn');
+  if (templateCancelBtn) {
+    templateCancelBtn.addEventListener('click', () => {
+      if (typeof hideTemplateInputForm === 'function') {
+        hideTemplateInputForm();
       }
     });
   }

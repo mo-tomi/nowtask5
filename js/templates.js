@@ -212,16 +212,49 @@ function applyTemplate(template) {
 }
 
 /**
- * 現在の入力内容をテンプレートとして保存
+ * テンプレート入力フォームを表示
  */
-function saveCurrentAsTemplate() {
-  const titleInput = document.getElementById('task-title');
-  const memoInput = document.getElementById('task-memo');
-  const durationSelect = document.getElementById('task-duration');
-  const startTimeInput = document.getElementById('task-start-time');
-  const endTimeInput = document.getElementById('task-end-time');
+function showTemplateInputForm() {
+  const form = document.getElementById('template-input-form');
+  const addBtn = document.getElementById('add-template-btn');
 
-  const name = titleInput ? titleInput.value.trim() : '';
+  if (form && addBtn) {
+    form.style.display = 'block';
+    addBtn.style.display = 'none';
+
+    // フォームをクリア
+    document.getElementById('template-name-input').value = '';
+    document.getElementById('template-memo-input').value = '';
+    document.getElementById('template-duration-input').value = '';
+    document.getElementById('template-start-time-input').value = '';
+    document.getElementById('template-end-time-input').value = '';
+  }
+}
+
+/**
+ * テンプレート入力フォームを非表示
+ */
+function hideTemplateInputForm() {
+  const form = document.getElementById('template-input-form');
+  const addBtn = document.getElementById('add-template-btn');
+
+  if (form && addBtn) {
+    form.style.display = 'none';
+    addBtn.style.display = 'block';
+  }
+}
+
+/**
+ * テンプレート入力フォームから保存
+ */
+function saveTemplateFromForm() {
+  const nameInput = document.getElementById('template-name-input');
+  const memoInput = document.getElementById('template-memo-input');
+  const durationSelect = document.getElementById('template-duration-input');
+  const startTimeInput = document.getElementById('template-start-time-input');
+  const endTimeInput = document.getElementById('template-end-time-input');
+
+  const name = nameInput ? nameInput.value.trim() : '';
 
   if (!name) {
     alert('タスク名を入力してください');
@@ -234,6 +267,7 @@ function saveCurrentAsTemplate() {
   const endTime = endTimeInput ? endTimeInput.value : null;
 
   addTemplate(name, duration, startTime, endTime, memo);
+  hideTemplateInputForm();
   renderTemplatesList();
 
   alert(`「${name}」をテンプレートとして保存しました`);
