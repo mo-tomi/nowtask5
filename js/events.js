@@ -51,6 +51,56 @@ function initEventListeners() {
     });
   }
 
+  // カレンダーアイコン
+  const calendarIconBtn = document.getElementById('calendar-icon-btn');
+  if (calendarIconBtn) {
+    calendarIconBtn.addEventListener('click', () => {
+      if (typeof openCalendarModal === 'function') {
+        openCalendarModal();
+      }
+    });
+  }
+
+  // カレンダーモーダルを閉じる
+  const closeCalendarBtn = document.getElementById('close-calendar-btn');
+  if (closeCalendarBtn) {
+    closeCalendarBtn.addEventListener('click', () => {
+      if (typeof closeCalendarModal === 'function') {
+        closeCalendarModal();
+      }
+    });
+  }
+
+  // カレンダーモーダル外クリックで閉じる
+  const calendarModal = document.getElementById('calendar-modal');
+  if (calendarModal) {
+    calendarModal.addEventListener('click', (e) => {
+      if (e.target.id === 'calendar-modal') {
+        if (typeof closeCalendarModal === 'function') {
+          closeCalendarModal();
+        }
+      }
+    });
+  }
+
+  // カレンダーナビゲーション
+  const calendarPrevBtn = document.getElementById('calendar-prev-btn');
+  const calendarNextBtn = document.getElementById('calendar-next-btn');
+  if (calendarPrevBtn) {
+    calendarPrevBtn.addEventListener('click', () => {
+      if (typeof goToPreviousMonth === 'function') {
+        goToPreviousMonth();
+      }
+    });
+  }
+  if (calendarNextBtn) {
+    calendarNextBtn.addEventListener('click', () => {
+      if (typeof goToNextMonth === 'function') {
+        goToNextMonth();
+      }
+    });
+  }
+
   // 設定保存
   document.getElementById('save-settings-btn').addEventListener('click', () => {
     saveSettings();
