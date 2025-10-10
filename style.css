@@ -426,27 +426,32 @@ body {
 }
 
 .remaining-tasks {
-  font-size: 14px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 16px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
 }
 
 /* 密度に応じた自由時間表示の色変化 */
 .density-green .remaining-tasks {
-  color: #2e7d32;
-  background: rgba(76, 175, 80, 0.15);
+  color: #1b5e20;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.25) 0%, rgba(76, 175, 80, 0.35) 100%);
+  border: 2px solid rgba(76, 175, 80, 0.4);
 }
 
 .density-yellow .remaining-tasks {
-  color: #f57f17;
-  background: rgba(255, 193, 7, 0.15);
+  color: #e65100;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.25) 0%, rgba(255, 193, 7, 0.35) 100%);
+  border: 2px solid rgba(255, 193, 7, 0.4);
 }
 
 .density-red .remaining-tasks {
-  color: #c62828;
-  background: rgba(244, 67, 54, 0.15);
+  color: #b71c1c;
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.25) 0%, rgba(244, 67, 54, 0.35) 100%);
+  border: 2px solid rgba(244, 67, 54, 0.4);
 }
 
 .time-gauge {
