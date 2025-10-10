@@ -10,33 +10,82 @@ function generateShareData() {
   const today = new Date();
   const todayDateStr = today.toISOString().split('T')[0];
 
-  // 今日のタスクを抽出
+  const baseDate = new Date();
+  baseDate.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(baseDate);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // 今日のタスクを抽出（完了済みを除く）
   const todayTasks = tasks.filter(task => {
-    if (task.isDeleted || task.parentId) return false;
+    if (task.isCompleted || task.parentId) return false;
     if (!task.dueDate) return false;
-    const taskDate = new Date(task.dueDate).toISOString().split('T')[0];
-    return taskDate === todayDateStr;
+    const dueDate = new Date(task.dueDate);
+    return dueDate >= baseDate && dueDate < tomorrow;
+  });
+
+  // 全てのタスク（完了済みを含む）
+  const allTodayTasks = tasks.filter(task => {
+    if (task.parentId) return false;
+    if (!task.dueDate) return false;
+    const dueDate = new Date(task.dueDate);
+    return dueDate >= baseDate && dueDate < tomorrow;
   });
 
   // 完了済みと未完了を分ける
-  const completedTasks = todayTasks.filter(t => t.isCompleted);
-  const incompleteTasks = todayTasks.filter(t => !t.isCompleted);
+  const completedTasks = allTodayTasks.filter(t => t.isCompleted);
+  const incompleteTasks = allTodayTasks.filter(t => !t.isCompleted);
 
-  // 空き時間を計算
-  const totalScheduledMinutes = todayTasks.reduce((sum, task) => {
-    return sum + (task.duration || 0);
-  }, 0);
-  const freeMinutes = 24 * 60 - totalScheduledMinutes;
+  // 現在時刻（分単位）
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // これから先のタスク時間を計算（gauge.jsと同じロジック）
+  let totalDurationMinutes = 0;
+
+  todayTasks.forEach(task => {
+    if (task.startTime && task.endTime) {
+      const [startHour, startMin] = task.startTime.split(':').map(Number);
+      const [endHour, endMin] = task.endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      let endMinutes = endHour * 60 + endMin;
+
+      // 日をまたぐ場合の処理
+      if (endMinutes < startMinutes) {
+        const todayPortion = (24 * 60) - startMinutes;
+        if (startMinutes >= currentMinutes) {
+          totalDurationMinutes += todayPortion;
+        } else if ((24 * 60) > currentMinutes) {
+          totalDurationMinutes += (24 * 60) - currentMinutes;
+        }
+      } else {
+        if (endMinutes > currentMinutes) {
+          if (startMinutes >= currentMinutes) {
+            totalDurationMinutes += endMinutes - startMinutes;
+          } else {
+            totalDurationMinutes += endMinutes - currentMinutes;
+          }
+        }
+      }
+    } else if (task.duration) {
+      totalDurationMinutes += task.duration;
+    }
+  });
+
+  // 残り時間から空き時間を計算
+  const totalMinutesInDay = 24 * 60;
+  const remainingTimeInDay = totalMinutesInDay - currentMinutes;
+  const freeMinutes = remainingTimeInDay - totalDurationMinutes;
   const freeHours = Math.floor(freeMinutes / 60);
   const freeMinutesRemainder = freeMinutes % 60;
 
   return {
-    todayTasks,
+    todayTasks: allTodayTasks,
     completedTasks,
     incompleteTasks,
     freeHours,
     freeMinutes: freeMinutesRemainder,
-    totalScheduledMinutes
+    totalScheduledMinutes: totalDurationMinutes
   };
 }
 
