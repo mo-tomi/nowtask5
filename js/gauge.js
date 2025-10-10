@@ -291,9 +291,14 @@ function updateScheduledTasks(dateArg) {
     return false;
   });
 
-  // 現在時刻（分単位）
+  // 現在時刻（分単位）- 表示中の日付が今日の場合のみ現在時刻を使用
   const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isToday = formatDateISO(baseDate) === formatDateISO(today);
+
+  // 今日の場合は現在時刻、それ以外の日は0:00を基準にする
+  const currentMinutes = isToday ? (now.getHours() * 60 + now.getMinutes()) : 0;
 
   // 【重要】これから先のタスク時間のみ計算
   let totalDurationMinutes = 0;
@@ -432,8 +437,8 @@ function updateScheduledTasks(dateArg) {
 
   // 【修正】空き時間と密度の計算
   const totalMinutesInDay = 24 * 60;
-  const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
-  const remainingTimeInDay = totalMinutesInDay - currentMinutesFromMidnight; // これから先の時間
+  // 今日の場合は残り時間、それ以外の日は24時間全体を基準にする
+  const remainingTimeInDay = isToday ? (totalMinutesInDay - currentMinutes) : totalMinutesInDay;
   const freeTimeMinutes = remainingTimeInDay - totalDurationMinutes; // 空き時間
 
   // 自由時間ゲージ更新
