@@ -54,11 +54,15 @@ function initEventListeners() {
   // テンプレート選択ボタン
   const templateSelectBtn = document.getElementById('template-select-btn');
   if (templateSelectBtn) {
-    templateSelectBtn.addEventListener('click', () => {
+    const handleTemplateOpen = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof openTemplateModal === 'function') {
         openTemplateModal();
       }
-    });
+    };
+    templateSelectBtn.addEventListener('click', handleTemplateOpen);
+    templateSelectBtn.addEventListener('touchend', handleTemplateOpen);
   }
 
   // テンプレートモーダルを閉じる
