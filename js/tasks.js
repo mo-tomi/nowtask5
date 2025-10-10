@@ -444,11 +444,13 @@ function createDailyRoutineTasks() {
     if (existsToday) return;
 
     // ルーティンタスクを作成
+    const todayISO = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString();
+
     const task = {
       id: generateUUID(),
       title: routine.name,
       memo: '',
-      dueDate: null,
+      dueDate: todayISO, // 今日の日付を自動設定
       isCompleted: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -458,6 +460,10 @@ function createDailyRoutineTasks() {
       isTimerRunning: false,
       timerStartTime: null,
       duration: routine.duration,
+      startTime: routine.startTime || null, // ルーティンの開始時刻
+      endTime: routine.endTime || null, // ルーティンの終了時刻
+      urgent: false,
+      priority: '',
       isRoutine: true,
       routineId: routine.id
     };

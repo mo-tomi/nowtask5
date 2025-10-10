@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nowtask-v2.4.0';
+const CACHE_NAME = 'nowtask-v2.6.0';
 const urlsToCache = [
   '/',
   '/index.html',
