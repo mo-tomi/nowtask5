@@ -107,6 +107,13 @@ body {
   pointer-events: none;
 }
 
+.quick-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .quick-input-wrapper {
   position: relative;
   display: flex;
@@ -114,6 +121,7 @@ body {
   background: white;
   border-radius: 4px;
   padding-right: 4px;
+  flex: 1;
 }
 
 .quick-add #quick-add-input {
@@ -267,17 +275,18 @@ body {
 
 .quick-history-tags {
   display: none;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
   margin-bottom: 4px;
-  overflow-x: auto;
   padding: 4px 0;
+  max-height: 120px;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 .quick-history-tags::-webkit-scrollbar {
-  height: 4px;
+  width: 4px;
 }
 
 .quick-history-tags::-webkit-scrollbar-track {

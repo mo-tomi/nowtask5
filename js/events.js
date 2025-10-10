@@ -333,15 +333,19 @@ function initEventListeners() {
       e.stopPropagation();
       e.preventDefault();
       const isVisible = quickHistoryTags.style.display === 'flex';
-      quickHistoryTags.style.display = isVisible ? 'none' : 'flex';
+      if (isVisible) {
+        quickHistoryTags.style.display = 'none';
+      } else {
+        renderHistoryTags();
+        quickHistoryTags.style.display = 'flex';
+      }
     });
   }
 
-  // 初期描画（最初は表示）
+  // 初期描画（最初は非表示）
   if (quickHistoryTags) {
-    quickHistoryTags.style.display = 'flex';
+    quickHistoryTags.style.display = 'none';
   }
-  renderHistoryTags();
 
   // 履歴更新時に再描画
   document.addEventListener('task:history:updated', () => {
