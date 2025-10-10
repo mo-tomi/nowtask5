@@ -181,17 +181,9 @@ body {
 }
 
 .quick-action-btn.has-date {
-  background: white;
-  color: #000000;
-}
-
-.quick-submit-btn {
-  background: white;
-  color: #000000;
-}
-
-.quick-submit-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: #000000;
+  color: white;
+  border-color: #000000;
 }
 
 .quick-datetime-panel {
