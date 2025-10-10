@@ -122,35 +122,58 @@
     <!-- タスクリスト -->
     <div class="tab-content active" id="tasks-tab">
       <!-- 24時間ゲージ -->
-      <div class="time-gauge-container" id="time-gauge-container">
-        <div class="time-gauge-header">
-          <button class="gauge-nav-btn" id="gauge-prev-btn">‹</button>
+      <section class="time-gauge-container" id="time-gauge-container" role="region" aria-label="24時間タイムゲージ">
+        <header class="time-gauge-header">
+          <button
+            class="gauge-nav-btn"
+            id="gauge-prev-btn"
+            aria-label="前の日に移動"
+            title="前の日に移動"
+            type="button">
+            ‹
+          </button>
           <div class="gauge-header-center">
-            <span class="current-time" id="current-time">00:00</span>
-            <span class="remaining-tasks" id="remaining-tasks">残り: 0時間</span>
+            <time class="current-time" id="current-time" datetime="00:00" aria-live="polite">00:00</time>
+            <div class="remaining-tasks" id="remaining-tasks" role="status" aria-live="polite" aria-atomic="true">
+              残り: 0時間
+            </div>
           </div>
-          <button class="gauge-nav-btn" id="gauge-next-btn">›</button>
-        </div>
-        <div class="time-gauge">
-          <div class="time-gauge-bg"></div>
-          <div class="time-gauge-gridlines">
+          <button
+            class="gauge-nav-btn"
+            id="gauge-next-btn"
+            aria-label="次の日に移動"
+            title="次の日に移動"
+            type="button">
+            ›
+          </button>
+        </header>
+        <div
+          class="time-gauge"
+          role="progressbar"
+          aria-label="24時間の経過時間"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          tabindex="0">
+          <div class="time-gauge-bg" aria-hidden="true"></div>
+          <div class="time-gauge-gridlines" aria-hidden="true">
             <div class="gridline" style="left: 25%;"></div>
             <div class="gridline" style="left: 50%;"></div>
             <div class="gridline" style="left: 75%;"></div>
           </div>
-          <div class="time-gauge-elapsed" id="time-gauge-elapsed"></div>
-          <div class="time-gauge-scheduled" id="time-gauge-scheduled"></div>
-          <div class="time-gauge-free" id="time-gauge-free"></div>
-          <div class="time-marker" id="time-marker"></div>
+          <div class="time-gauge-elapsed" id="time-gauge-elapsed" aria-hidden="true"></div>
+          <div class="time-gauge-scheduled" id="time-gauge-scheduled" aria-hidden="true"></div>
+          <div class="time-gauge-free" id="time-gauge-free" aria-hidden="true"></div>
+          <div class="time-marker" id="time-marker" aria-label="現在時刻マーカー" role="img"></div>
         </div>
-        <div class="time-gauge-labels">
-          <span>0:00</span>
-          <span>6:00</span>
-          <span>12:00</span>
-          <span>18:00</span>
-          <span>24:00</span>
+        <div class="time-gauge-labels" role="list" aria-label="時間ラベル">
+          <span role="listitem" aria-label="0時">0:00</span>
+          <span role="listitem" aria-label="6時">6:00</span>
+          <span role="listitem" aria-label="12時">12:00</span>
+          <span role="listitem" aria-label="18時">18:00</span>
+          <span role="listitem" aria-label="24時">24:00</span>
         </div>
-      </div>
+      </section>
 
       <!-- 絞り込みと並び替えコントロール -->
       <div class="filter-sort-container" style="display:flex; align-items:center; gap:12px; margin: 12px 0; flex-wrap: wrap;">
