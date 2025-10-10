@@ -98,31 +98,43 @@ function initEventListeners() {
   // テンプレート追加ボタン（フォーム表示）
   const addTemplateBtn = document.getElementById('add-template-btn');
   if (addTemplateBtn) {
-    addTemplateBtn.addEventListener('click', () => {
+    const handleAddTemplate = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof showTemplateInputForm === 'function') {
         showTemplateInputForm();
       }
-    });
+    };
+    addTemplateBtn.addEventListener('click', handleAddTemplate);
+    addTemplateBtn.addEventListener('touchend', handleAddTemplate);
   }
 
   // テンプレートフォーム保存ボタン
   const templateSaveBtn = document.getElementById('template-save-btn');
   if (templateSaveBtn) {
-    templateSaveBtn.addEventListener('click', () => {
+    const handleTemplateSave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof saveTemplateFromForm === 'function') {
         saveTemplateFromForm();
       }
-    });
+    };
+    templateSaveBtn.addEventListener('click', handleTemplateSave);
+    templateSaveBtn.addEventListener('touchend', handleTemplateSave);
   }
 
   // テンプレートフォームキャンセルボタン
   const templateCancelBtn = document.getElementById('template-cancel-btn');
   if (templateCancelBtn) {
-    templateCancelBtn.addEventListener('click', () => {
+    const handleTemplateCancel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof hideTemplateInputForm === 'function') {
         hideTemplateInputForm();
       }
-    });
+    };
+    templateCancelBtn.addEventListener('click', handleTemplateCancel);
+    templateCancelBtn.addEventListener('touchend', handleTemplateCancel);
   }
 
   // カレンダーアイコン
