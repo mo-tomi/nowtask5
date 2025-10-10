@@ -450,6 +450,32 @@ function initEventListeners() {
       }
     });
   }
+
+  // クイック入力のスクロール時の表示/非表示制御
+  const quickAddForm = document.getElementById('quick-add-form');
+  if (quickAddForm && tasksListContainer) {
+    let scrollTimeout = null;
+    let isScrolling = false;
+
+    tasksListContainer.addEventListener('scroll', () => {
+      // スクロール中はクイック入力を非表示
+      if (!isScrolling) {
+        isScrolling = true;
+        quickAddForm.classList.add('hidden');
+      }
+
+      // 既存のタイムアウトをクリア
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // スクロール停止後3秒で再表示
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        quickAddForm.classList.remove('hidden');
+      }, 3000);
+    });
+  }
 }
 
 // タブUIは廃止しました。表示切替は showTasks/showTrash を使用します。

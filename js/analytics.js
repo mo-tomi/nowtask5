@@ -13,6 +13,8 @@ function getTaskRanking() {
   const completedTasks = tasks
     .filter(task => {
       if (!task.isCompleted) return false;
+      // ランキングから除外されているタスクは含めない
+      if (task.excludeFromRanking) return false;
       // totalTimeまたはdurationがある場合のみ含める
       return (task.totalTime && task.totalTime > 0) || (task.duration && task.duration > 0);
     })
@@ -71,9 +73,26 @@ function renderTaskRanking() {
           <div class="ranking-task-name">${escapeHtml(task.title)}</div>
         </div>
         <div class="ranking-time">${timeText}</div>
+        <button class="ranking-exclude-btn" data-task-id="${task.id}" title="ランキングから除外">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
     `;
   }).join('');
+
+  // 除外ボタンのイベントリスナーを追加
+  const excludeBtns = container.querySelectorAll('.ranking-exclude-btn');
+  excludeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const taskId = btn.dataset.taskId;
+      toggleTaskRankingExclusion(taskId);
+      renderTaskRanking(); // ランキングを再描画
+    });
+  });
 }
 
 /**
@@ -217,4 +236,24 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * タスクのランキング除外状態を切り替え
+ * @param {string} taskId - タスクID
+ */
+function toggleTaskRankingExclusion(taskId) {
+  const tasks = getTasks();
+  const task = tasks.find(t => t.id === taskId);
+
+  if (!task) return;
+
+  // 除外フラグを切り替え（未設定の場合はfalseとして扱う）
+  task.excludeFromRanking = !task.excludeFromRanking;
+
+  // 更新日時を設定
+  task.updatedAt = new Date().toISOString();
+
+  // タスクを保存
+  saveTasks(tasks);
 }

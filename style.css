@@ -84,11 +84,27 @@ body {
 }
 
 .quick-add {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0;
+  background: #000000;
+  padding: 12px 16px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 99;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.quick-add.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .quick-input-wrapper {
@@ -102,7 +118,7 @@ body {
 
 .quick-add #quick-add-input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 12px 14px;
   padding-right: 110px;
   border: none;
   border-radius: 4px;
@@ -110,10 +126,12 @@ body {
   outline: none;
   transition: box-shadow 0.2s ease;
   width: 100%;
+  background: white;
+  color: #333;
 }
 
 .quick-add #quick-add-input:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
 .quick-add #quick-add-input::placeholder {
@@ -128,8 +146,8 @@ body {
   align-items: center;
 }
 
-.quick-icon-btn {
-  background: rgba(0, 0, 0, 0.05);
+.quick-action-btn {
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 4px;
   width: 32px;
@@ -138,32 +156,32 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #000000;
+  color: white;
   transition: all 0.2s ease;
   padding: 0;
 }
 
-.quick-icon-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+.quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
-.quick-icon-btn:active {
+.quick-action-btn:active {
   transform: scale(0.95);
 }
 
-.quick-icon-btn.has-date {
-  background: #000000;
-  color: white;
+.quick-action-btn.has-date {
+  background: white;
+  color: #000000;
 }
 
 .quick-submit-btn {
-  background: #000000;
-  color: white;
+  background: white;
+  color: #000000;
 }
 
 .quick-submit-btn:hover {
-  background: #333333;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .quick-datetime-panel {
@@ -173,6 +191,16 @@ body {
   padding: 16px;
   margin-top: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-datetime-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
 }
 
 .quick-datetime-row {
@@ -242,6 +270,7 @@ body {
   flex-wrap: nowrap;
   gap: 8px;
   margin-top: 8px;
+  margin-bottom: 4px;
   overflow-x: auto;
   padding: 4px 0;
   -webkit-overflow-scrolling: touch;
@@ -330,7 +359,7 @@ body {
 .main-content {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px 16px 80px;
+  padding: 20px 16px 120px;
 }
 
 .tab-content {
@@ -1862,7 +1891,7 @@ body {
   }
 
   .main-content {
-    padding: 16px 12px 80px;
+    padding: 16px 12px 120px;
   }
 
   .task-item {
@@ -2222,11 +2251,37 @@ body {
   background: #f5f5f5;
   border-radius: 8px;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .ranking-item:hover {
   background: #e0e0e0;
   transform: translateX(4px);
+}
+
+.ranking-exclude-btn {
+  background: rgba(244, 67, 54, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #f44336;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ranking-exclude-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: scale(1.1);
+}
+
+.ranking-exclude-btn:active {
+  transform: scale(0.95);
 }
 
 .ranking-position {
