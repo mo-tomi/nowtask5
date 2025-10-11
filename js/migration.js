@@ -129,23 +129,44 @@
       'nowtask_sort_pref'
     ];
 
+    let foundData = false;
     keys.forEach(key => {
       const data = localStorage.getItem(key);
       if (data) {
         exportData[key] = data;
+        foundData = true;
       }
     });
+
+    if (!foundData) {
+      alert('❌ LocalStorageにデータが見つかりません。\nこのWebサイトでタスクを作成していますか？');
+      return;
+    }
 
     const jsonString = JSON.stringify(exportData, null, 2);
     const textarea = document.getElementById('exportData');
     textarea.style.display = 'block';
     textarea.value = jsonString;
 
-    // クリップボードにコピー
-    textarea.select();
-    document.execCommand('copy');
-
-    alert('✅ データをエクスポートしました！\n下に表示されています。\nクリップボードにもコピーされました。');
+    // クリップボードにコピー（モダンAPI使用）
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(jsonString).then(() => {
+        alert('✅ データをエクスポートしました！\n下に表示されています。\nクリップボードにもコピーされました。\n\n保存件数: ' + Object.keys(exportData).length + '件');
+      }).catch(() => {
+        // コピー失敗時はテキストエリアを選択
+        textarea.select();
+        alert('✅ データをエクスポートしました！\n下に表示されています。\n手動でコピーしてください。\n\n保存件数: ' + Object.keys(exportData).length + '件');
+      });
+    } else {
+      // 古いブラウザ用のフォールバック
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        alert('✅ データをエクスポートしました！\n下に表示されています。\nクリップボードにもコピーされました。\n\n保存件数: ' + Object.keys(exportData).length + '件');
+      } catch (err) {
+        alert('✅ データをエクスポートしました！\n下に表示されています。\n手動でコピーしてください。\n\n保存件数: ' + Object.keys(exportData).length + '件');
+      }
+    }
   }
 
   function importToFirestore() {
