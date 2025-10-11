@@ -2905,6 +2905,64 @@ body {
   background: #4caf50;
 }
 
+/* 月次統計 */
+.calendar-monthly-stats {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.monthly-stats-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.monthly-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.monthly-stat-card {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.monthly-stat-card:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.monthly-stat-card .stat-label {
+  font-size: 13px;
+  color: #757575;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.monthly-stat-card .stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #000000;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.monthly-stat-card .stat-unit {
+  font-size: 16px;
+  color: #757575;
+  margin-left: 4px;
+  font-weight: 500;
+}
+
 @media (max-width: 600px) {
   .calendar-grid {
     gap: 1px;
@@ -2962,5 +3020,32 @@ body {
 
   #calendar-modal .modal-header {
     padding: 12px;
+  }
+
+  .calendar-monthly-stats {
+    margin-top: 24px;
+    padding-top: 16px;
+  }
+
+  .monthly-stats-title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .monthly-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .monthly-stat-card {
+    padding: 16px;
+  }
+
+  .monthly-stat-card .stat-value {
+    font-size: 28px;
+  }
+
+  .monthly-stat-card .stat-unit {
+    font-size: 14px;
   }
 }

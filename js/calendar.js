@@ -37,6 +37,65 @@ function closeCalendarModal() {
 }
 
 /**
+ * 月次の空き時間統計を計算
+ */
+function calculateMonthlyFreeTime(year, month) {
+  const tasks = getTasks();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let totalScheduledMinutes = 0;
+  let totalFreeMinutes = 0;
+  let daysWithTasks = 0;
+
+  // 各日の空き時間を計算
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dateTasks = tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const taskDate = new Date(task.dueDate);
+      const taskDateStr = `${taskDate.getFullYear()}-${String(taskDate.getMonth() + 1).padStart(2, '0')}-${String(taskDate.getDate()).padStart(2, '0')}`;
+      return taskDateStr === dateStr;
+    });
+
+    if (dateTasks.length > 0) {
+      daysWithTasks++;
+    }
+
+    // その日のスケジュール時間を計算
+    let dayScheduledMinutes = 0;
+    dateTasks.forEach(task => {
+      if (task.startTime && task.endTime) {
+        const [startHour, startMin] = task.startTime.split(':').map(Number);
+        const [endHour, endMin] = task.endTime.split(':').map(Number);
+        const startMinutes = startHour * 60 + startMin;
+        let endMinutes = endHour * 60 + endMin;
+
+        // 日をまたぐ場合は24時までとして計算
+        if (endMinutes < startMinutes) {
+          endMinutes = 24 * 60;
+        }
+
+        dayScheduledMinutes += (endMinutes - startMinutes);
+      }
+    });
+
+    totalScheduledMinutes += dayScheduledMinutes;
+    // 1日24時間から予定時間を引く
+    totalFreeMinutes += (24 * 60 - dayScheduledMinutes);
+  }
+
+  return {
+    totalScheduledMinutes,
+    totalFreeMinutes,
+    totalScheduledHours: Math.floor(totalScheduledMinutes / 60),
+    totalFreeHours: Math.floor(totalFreeMinutes / 60),
+    averageFreeHoursPerDay: Math.floor(totalFreeMinutes / daysInMonth / 60),
+    daysWithTasks,
+    daysInMonth
+  };
+}
+
+/**
  * カレンダーを描画
  */
 function renderCalendar() {
@@ -158,6 +217,41 @@ function renderCalendar() {
 
     grid.appendChild(dateCell);
   }
+
+  // 月次統計を表示
+  renderMonthlyStats();
+}
+
+/**
+ * 月次統計を表示
+ */
+function renderMonthlyStats() {
+  const statsContainer = document.getElementById('calendar-monthly-stats');
+  if (!statsContainer) return;
+
+  const stats = calculateMonthlyFreeTime(currentCalendarYear, currentCalendarMonth);
+
+  statsContainer.innerHTML = `
+    <div class="monthly-stats-title">📊 ${currentCalendarYear}年${currentCalendarMonth + 1}月の統計</div>
+    <div class="monthly-stats-grid">
+      <div class="monthly-stat-card">
+        <div class="stat-label">予定時間</div>
+        <div class="stat-value">${stats.totalScheduledHours}<span class="stat-unit">時間</span></div>
+      </div>
+      <div class="monthly-stat-card">
+        <div class="stat-label">空き時間</div>
+        <div class="stat-value">${stats.totalFreeHours}<span class="stat-unit">時間</span></div>
+      </div>
+      <div class="monthly-stat-card">
+        <div class="stat-label">1日平均空き時間</div>
+        <div class="stat-value">${stats.averageFreeHoursPerDay}<span class="stat-unit">時間</span></div>
+      </div>
+      <div class="monthly-stat-card">
+        <div class="stat-label">予定がある日</div>
+        <div class="stat-value">${stats.daysWithTasks}<span class="stat-unit">/${stats.daysInMonth}日</span></div>
+      </div>
+    </div>
+  `;
 }
 
 /**
