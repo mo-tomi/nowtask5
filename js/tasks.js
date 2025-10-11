@@ -46,7 +46,7 @@ function canHaveSubtask(taskId) {
 }
 
 // タスク作成
-function createTask(title, memo = '', dueDate = null, parentId = null, isTutorial = false, duration = null) {
+function createTask(title, memo = '', dueDate = null, parentId = null, isTutorial = false, duration = null, startTime = null, endTime = null) {
   if (!title || title.trim().length === 0) {
     return null;
   }
@@ -66,8 +66,8 @@ function createTask(title, memo = '', dueDate = null, parentId = null, isTutoria
     isTimerRunning: false,
     timerStartTime: null,
     duration: duration, // 所要時間（分） - 廃止予定
-    startTime: null, // 開始時刻 (HH:MM)
-    endTime: null, // 終了時刻 (HH:MM)
+    startTime: startTime, // 開始時刻 (HH:MM)
+    endTime: endTime, // 終了時刻 (HH:MM)
     urgent: false, // 緊急フラグ
     priority: '' // 優先順位 (high, medium, low, '')
   };
@@ -87,7 +87,56 @@ function createTask(title, memo = '', dueDate = null, parentId = null, isTutoria
     }
   }
 
+  // サブタスクの場合、親タスクの時間を集計
+  if (parentId && typeof aggregateSubtaskTimes === 'function') {
+    aggregateSubtaskTimes(parentId);
+  }
+
   return task;
+}
+
+// サブタスクの時間をメインタスクに集計
+function aggregateSubtaskTimes(taskId) {
+  const task = getTaskById(taskId);
+  if (!task) return false;
+
+  // メインタスクに時間が設定されている場合はスキップ
+  if (task.startTime || task.endTime) return false;
+
+  const subtasks = getSubtasks(taskId);
+  if (subtasks.length === 0) return false;
+
+  // サブタスクの中で時間が設定されているものを探す
+  const subtasksWithTime = subtasks.filter(st => st.startTime || st.endTime);
+  if (subtasksWithTime.length === 0) return false;
+
+  // 最も早い開始時刻と最も遅い終了時刻を見つける
+  let earliestStart = null;
+  let latestEnd = null;
+
+  subtasksWithTime.forEach(subtask => {
+    if (subtask.startTime) {
+      if (!earliestStart || subtask.startTime < earliestStart) {
+        earliestStart = subtask.startTime;
+      }
+    }
+    if (subtask.endTime) {
+      if (!latestEnd || subtask.endTime > latestEnd) {
+        latestEnd = subtask.endTime;
+      }
+    }
+  });
+
+  // メインタスクに時間を設定
+  if (earliestStart || latestEnd) {
+    updateTask(taskId, {
+      startTime: earliestStart,
+      endTime: latestEnd
+    });
+    return true;
+  }
+
+  return false;
 }
 
 // タスク更新
@@ -97,13 +146,20 @@ function updateTask(id, updates) {
 
   if (index === -1) return false;
 
+  const task = tasks[index];
   tasks[index] = {
-    ...tasks[index],
+    ...task,
     ...updates,
     updatedAt: new Date().toISOString()
   };
 
   saveTasks(tasks);
+
+  // サブタスクの場合、親タスクの時間を集計
+  if (task.parentId && typeof aggregateSubtaskTimes === 'function') {
+    aggregateSubtaskTimes(task.parentId);
+  }
+
   return true;
 }
 

@@ -243,6 +243,11 @@ function saveTask() {
         saveTasks(newTasks);
       }
     });
+
+    // サブタスクの時間をメインタスクに集計
+    if (typeof aggregateSubtaskTimes === 'function') {
+      aggregateSubtaskTimes(editingTaskId);
+    }
   } else {
     // 新規作成
     const tasks = getTasks();

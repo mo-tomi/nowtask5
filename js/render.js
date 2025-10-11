@@ -567,6 +567,9 @@ function createSubtaskInputInline(parentId, parentLevel = 0) {
 let draggedElement = null;
 let longPressTimer = null;
 let isDragging = false;
+let dragStartX = 0;
+let dragStartLevel = 0;
+let currentDragLevel = 0;
 
 function setupDragAndDrop(element, task) {
   let startY = 0;
@@ -587,6 +590,9 @@ function setupDragAndDrop(element, task) {
     longPressTimer = setTimeout(() => {
       isDragging = true;
       draggedElement = element;
+      dragStartX = startX;
+      dragStartLevel = Number(element.dataset.level || 0);
+      currentDragLevel = dragStartLevel;
       element.classList.add('dragging');
       // 振動フィードバック（対応デバイスのみ）
       if (navigator.vibrate) {
@@ -610,6 +616,28 @@ function setupDragAndDrop(element, task) {
     if (isDragging && draggedElement) {
       e.preventDefault();
       const touch = e.touches[0];
+
+      // 水平方向のドラッグで階層を変更
+      const deltaX = touch.clientX - dragStartX;
+      const indentSize = 40; // 1階層のインデント幅（px）
+      const levelChange = Math.floor(deltaX / indentSize);
+      const newLevel = Math.max(0, Math.min(4, dragStartLevel + levelChange));
+
+      // レベルが変更された場合、視覚的なフィードバックを提供
+      if (newLevel !== currentDragLevel) {
+        currentDragLevel = newLevel;
+        draggedElement.dataset.level = newLevel;
+        draggedElement.className = 'task-item dragging';
+        if (newLevel > 0) {
+          draggedElement.classList.add('subtask');
+          draggedElement.classList.add(`level-${newLevel}`);
+        }
+        // 振動フィードバック
+        if (navigator.vibrate) {
+          navigator.vibrate(20);
+        }
+      }
+
       const afterElement = getDragAfterElement(element.parentElement, touch.clientY);
 
       if (afterElement == null) {
@@ -635,6 +663,9 @@ function setupDragAndDrop(element, task) {
 
       isDragging = false;
       draggedElement = null;
+      dragStartX = 0;
+      dragStartLevel = 0;
+      currentDragLevel = 0;
     }
   });
 
@@ -649,7 +680,31 @@ function setupDragAndDrop(element, task) {
     }
 
     draggedElement = element;
+    dragStartX = e.clientX;
+    dragStartLevel = Number(element.dataset.level || 0);
+    currentDragLevel = dragStartLevel;
     element.classList.add('dragging');
+  });
+
+  element.addEventListener('drag', (e) => {
+    if (e.clientX === 0 && e.clientY === 0) return; // ドラッグ終了時のイベントを無視
+
+    // 水平方向のドラッグで階層を変更
+    const deltaX = e.clientX - dragStartX;
+    const indentSize = 40; // 1階層のインデント幅（px）
+    const levelChange = Math.floor(deltaX / indentSize);
+    const newLevel = Math.max(0, Math.min(4, dragStartLevel + levelChange));
+
+    // レベルが変更された場合、視覚的なフィードバックを提供
+    if (newLevel !== currentDragLevel) {
+      currentDragLevel = newLevel;
+      draggedElement.dataset.level = newLevel;
+      draggedElement.className = 'task-item dragging';
+      if (newLevel > 0) {
+        draggedElement.classList.add('subtask');
+        draggedElement.classList.add(`level-${newLevel}`);
+      }
+    }
   });
 
   element.addEventListener('dragend', () => {
@@ -659,6 +714,9 @@ function setupDragAndDrop(element, task) {
     saveNewTaskOrder();
 
     draggedElement = null;
+    dragStartX = 0;
+    dragStartLevel = 0;
+    currentDragLevel = 0;
   });
 
   element.addEventListener('dragover', (e) => {
@@ -694,18 +752,104 @@ function saveNewTaskOrder() {
   const tasks = getTasks();
   const taskElements = document.querySelectorAll('.task-item:not(.completed)');
 
-  // 新しい順序でタスクIDを取得
+  // 新しい順序とレベルでタスクIDを取得
   const newOrder = [];
   taskElements.forEach(el => {
     const taskId = el.dataset.taskId;
     if (taskId) {
-      newOrder.push(taskId);
+      newOrder.push({
+        id: taskId,
+        level: Number(el.dataset.level || 0)
+      });
     }
   });
 
+  // ドラッグされたタスクの新しい親を決定
+  const draggedTaskId = draggedElement ? draggedElement.dataset.taskId : null;
+  if (draggedTaskId) {
+    const draggedIndex = newOrder.findIndex(item => item.id === draggedTaskId);
+    if (draggedIndex !== -1) {
+      const draggedLevel = newOrder[draggedIndex].level;
+      let newParentId = null;
+
+      // ドラッグされたタスクの直前のタスクを探す
+      for (let i = draggedIndex - 1; i >= 0; i--) {
+        const prevTask = newOrder[i];
+
+        // 同じレベルの場合は、同じ親を持つ
+        if (prevTask.level === draggedLevel) {
+          const prevTaskData = getTaskById(prevTask.id);
+          newParentId = prevTaskData ? prevTaskData.parentId : null;
+          break;
+        }
+        // 1つ浅いレベルの場合は、そのタスクを親とする
+        else if (prevTask.level === draggedLevel - 1) {
+          newParentId = prevTask.id;
+          break;
+        }
+        // より浅いレベルの場合は、そのレベルまで戻って親を探す
+        else if (prevTask.level < draggedLevel - 1) {
+          const prevTaskData = getTaskById(prevTask.id);
+          newParentId = prevTaskData ? prevTaskData.parentId : null;
+          break;
+        }
+      }
+
+      // バリデーション: 新しい親が有効かチェック
+      const draggedTask = getTaskById(draggedTaskId);
+      let isValidParent = true;
+
+      if (newParentId) {
+        // 1. サブタスクを持つタスクは他のタスクのサブタスクにできない
+        const draggedSubtasks = getSubtasks(draggedTaskId);
+        if (draggedSubtasks.length > 0) {
+          // 新しい親が設定される場合（独立タスクからサブタスクになる場合）
+          const newParentLevel = getTaskLevel(newParentId);
+          if (newParentLevel + draggedSubtasks.length + 1 > 4) {
+            isValidParent = false;
+          }
+        }
+
+        // 2. 5階層制限のチェック
+        const newParentLevel = getTaskLevel(newParentId);
+        if (newParentLevel >= 4) {
+          isValidParent = false;
+        }
+
+        // 3. 自分自身や自分の子孫を親にできない
+        let ancestor = newParentId;
+        while (ancestor) {
+          if (ancestor === draggedTaskId) {
+            isValidParent = false;
+            break;
+          }
+          const ancestorTask = getTaskById(ancestor);
+          ancestor = ancestorTask ? ancestorTask.parentId : null;
+        }
+      }
+
+      // ドラッグされたタスクの親IDを更新
+      if (draggedTask && draggedTask.parentId !== newParentId && isValidParent) {
+        updateTask(draggedTaskId, { parentId: newParentId });
+
+        // 元の親タスクの時間を再集計
+        if (draggedTask.parentId && typeof aggregateSubtaskTimes === 'function') {
+          aggregateSubtaskTimes(draggedTask.parentId);
+        }
+        // 新しい親タスクの時間を集計
+        if (newParentId && typeof aggregateSubtaskTimes === 'function') {
+          aggregateSubtaskTimes(newParentId);
+        }
+      } else if (!isValidParent) {
+        // 無効な親の場合は元のレベルに戻す
+        console.warn('Invalid parent: Cannot create this hierarchy');
+      }
+    }
+  }
+
   // タスクの順序を更新（customOrder フィールドを追加）
   tasks.forEach((task, index) => {
-    const newIndex = newOrder.indexOf(task.id);
+    const newIndex = newOrder.findIndex(item => item.id === task.id);
     if (newIndex !== -1) {
       task.customOrder = newIndex;
     }
